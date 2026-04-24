@@ -4,7 +4,9 @@
     --text-main: #ffffff;
     --text-muted: #a0aec0;
     --accent: #3b82f6;
-    --border: #333333;
+    --accent-light: #60a5fa;
+    --accent-hover: #2563eb;
+    --border: #444;
 }
 
 body {
@@ -45,15 +47,25 @@ body {
     display: flex;
     flex-direction: row;
     margin: 0;        
-    padding: 0;         
+    padding: 0;      
+    overflow: hidden; 
+    position: relative;
 }
 
 .loginDetails {
-  flex: 3;           
-  background-color: var(--bg-deep);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+    outline: none;
+    border: none;
+    flex: 3;           
+    background: linear-gradient(
+        180deg,
+        var(--bg-surface),
+        var(--bg-deep)
+    );
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    place-items: center;
+    border-right: 1px solid var(--border);
 }
 
 .logo {
@@ -64,11 +76,15 @@ body {
     left: 25px;
 }
 
-/* Right Side (The "Login Form" side) */
+h2 {
+    font-size: 28px;
+    letter-spacing: -0.5px;
+}
+
 .rightImage {
-  flex: 4;            /* The "4" in a 60/40 split */
+  flex: 5;            
   height: 100%;
-  background-color: #ffffff; /* Or your preferred surface color */
+  background-color: #ffffff; 
 }
 
 .rightImage img {
@@ -76,3 +92,130 @@ body {
   height: 100%;
   object-fit: cover;
 }
+
+.rightImage::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        to top left, 
+        rgba(18, 18, 18, 0.8) 0%, 
+        rgba(18, 18, 18, 0) 40%
+    );
+    pointer-events: none;
+}
+
+.subtitle {
+    color: var(--text-muted);
+    padding-top: 25px;
+    padding-bottom: 10px;
+}
+
+input[type = "email"], input[type = "password"] {
+    width: 75%;
+    background-color: var(--bg-surface);
+    padding: 20px;
+    border-radius: 15px;
+    font-size: 16px;
+    font-weight: 550;
+    border: 1px solid var(--text-muted);
+    transition: all 0.25s ease-in-out;
+}
+
+input[type = "email"] {
+    margin-bottom: 20px;
+}
+
+input[type = "email"]:hover, input[type = "password"]:hover {
+    outline: none;
+    border-color: var(--border);
+}
+
+input[type = "email"]:focus, input[type = "password"]:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+.mainBtn {
+    width: 82%;
+    margin-top: 20px;
+    padding: 20px;
+    background: linear-gradient(
+        90deg,
+        var(--accent-light),
+        var(--accent)
+    );
+    outline: none;
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: 550;
+    transition: all 0.25s ease-in-out;
+}
+
+.mainBtn:hover {
+    cursor: pointer;
+    background: linear-gradient(
+        90deg,
+        var(--accent-hover),
+        var(--accent)
+    );
+    transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0px);
+}
+
+.toggleText {
+    color: var(--text-muted);
+    padding-top: 10px;
+}
+
+.toggleText span {
+    display: inline-block;
+    color: var(--accent);
+    font-weight: 500;
+    transition: all 0.25s ease-in-out;
+}
+
+.toggleText span:hover {
+    transform: scale(1.1);
+    cursor: pointer;
+    font-weight: 550;
+}
+
+.imageOverlay {
+    position: absolute;
+    bottom: 8%;
+    right: 8%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+    z-index: 1;
+}
+
+.imageOverlay p {
+    color: var(--text-muted);
+    font-size: 24px;
+    font-weight: 350;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin: 5px 0;
+    transition: all 0.3s ease;
+    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.9), 
+                 0px 0px 20px rgba(0, 0, 0, 0.5);
+}
+
+.imageOverlay p span {
+    color: var(--accent);
+    font-weight: 625;
+}
+
+.imageOverlay p:nth-child(1) { margin-right: 60px; }
+.imageOverlay p:nth-child(2) { margin-right: 30px; } 
+.imageOverlay p:nth-child(3) { margin-right: 0; }    
