@@ -76,6 +76,14 @@ body {
     left: 25px;
 }
 
+.logo-reg {
+    height: 100px;
+    width: auto;
+    position: absolute;
+    top: 25px;
+    right: 25px;
+}
+
 h2 {
     font-size: 28px;
     letter-spacing: -0.5px;
