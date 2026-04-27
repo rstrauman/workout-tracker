@@ -5,7 +5,7 @@ import { onAuthStateChanged } from "firebase/auth";
 
 import Login from "./pages/Login/Login";
 import Verification from "./pages/Verification/Verification";
-import Onboarding from "./pages/Onboarding/Onboarding";
+import Profile from "./pages/Profile/Profile";
 import Workout from "./pages/Workout/Workout";
 
 function App() {
@@ -30,7 +30,12 @@ function App() {
             } />
 
             <Route path="/verify" element={<Verification />} />
-            <Route path="/onboarding" element={<Onboarding />} />
+            
+            <Route path="/onboarding" element={<Profile isOnboarding={true} />} />
+            <Route path="/profile" element={<Profile isOnboarding={false} />} />
+            
+            {/* <Route path="/onboarding" element={<Onboarding />} /> */}
+            
             <Route path="/workout" element={<Workout />} />
             
             <Route path="*" element={<Navigate to="/" />} />

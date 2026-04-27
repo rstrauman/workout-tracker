@@ -16,7 +16,7 @@ function VerifyEmail() {
         await auth.currentUser.reload();
     
         if (auth.currentUser.emailVerified) {
-            navigate("/onboarding");
+            navigate("/profile");
         } else {
             alert("Email not verified yet. Please check your inbox!");
         }
@@ -41,13 +41,11 @@ function VerifyEmail() {
                 Please check your inbox (and spam folder) to continue.
             </p>
             <div className={styles.actionGroup}>
-                {/* Changed onCheckStatus to checkVerification */}
                 <button className={styles.mainBtn} onClick={checkVerification}>
                     I've Verified
                 </button>
                 <p className={styles.toggleText}>
                     Didn't get the email? 
-                    {/* Changed onResend to resendEmail */}
                     <span onClick={resendEmail} style={{cursor: 'pointer', color: '#3b82f6'}}> Resend Link</span>
                 </p>
             </div>
