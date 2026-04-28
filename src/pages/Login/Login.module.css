@@ -129,7 +129,7 @@ h2 {
     padding-top: 10px;
 }
 
-input[type = "email"], input[type = "password"] {
+.loginDetails input[type = "email"], .loginDetails input[type = "password"] {
     width: 75%;
     background-color: var(--bg-surface);
     padding: 20px;
@@ -140,16 +140,16 @@ input[type = "email"], input[type = "password"] {
     transition: all 0.25s ease-in-out;
 }
 
-input[type = "email"] {
+.loginDetails input[type = "email"] {
     margin-bottom: 20px;
 }
 
-input[type = "email"]:hover, input[type = "password"]:hover {
+.loginDetails input[type = "email"]:hover, .loginDetails input[type = "password"]:hover {
     outline: none;
     border-color: var(--border);
 }
 
-input[type = "email"]:focus, input[type = "password"]:focus {
+.loginDetails input[type = "email"]:focus, .loginDetails input[type = "password"]:focus {
     outline: none;
     border-color: var(--accent);
 }
