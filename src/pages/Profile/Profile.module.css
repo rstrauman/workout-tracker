@@ -11,7 +11,7 @@
 
 .background {
     height: 100svh;
-    width: 100vw;
+    width: 100%;
     display: flex;
     justify-content: center;
     place-items: center;
@@ -61,19 +61,36 @@
 }
 
 .exitIcon {
-    padding: 6px 10px;
-    font-size: 18px;
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
     font-weight: bold;
-    color: #FF2C2C;
+    color: var(--text-muted);
     background: none;
     border: 1px solid var(--border);
     border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.25s ease;
 }
 
 .editIcon:hover, .exitIcon:hover {
     transform: scale(1.1);
     cursor: pointer;
+}
+
+.editIcon:hover {
     border-color: var(--text-muted);
+}
+
+.exitIcon:hover {
+    color: #FF2C2C;
+    border-color: #FF2C2C;
 }
 
 .stats {
@@ -83,7 +100,7 @@
     width: 100%; 
 }
 
-.stats input {
+.stats input, .dropdown {
     background-color: var(--bg-surface);
     padding: 10px 16px;
     border-radius: 15px;
@@ -96,12 +113,12 @@
     box-sizing: border-box; 
 }
 
-.stats input:hover {
+.stats input:hover, .dropdown:hover {
     outline: none;
     border-color: var(--border);
 }
 
-.stats input:focus {
+.stats input:focus, .dropdown:focus {
     outline: none;
     border-color: var(--accent);
 }
@@ -114,4 +131,47 @@
 .fullWidth input {
     width: 100%;
     box-sizing: border-box;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.dropdown {
+    width: 100%; 
+}
+
+.save, .home {
+    padding: 10px 16px;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: 550;
+    border: 1px solid var(--border);
+    transition: all 0.25s ease-in-out;
+    height: 48px; 
+    line-height: 1.2; 
+    box-sizing: border-box; 
+}
+
+.save {
+    background: #118811;
+}
+
+.save:hover, .home:hover {
+    cursor: pointer;
+    transform: scale(1.0075);
+}
+
+.save:hover {
+    background: #16a616;
+}
+
+.home {
+    background-color: var(--bg-surface);
+}
+
+.home:hover {
+    border-color: var(--text-muted);
 }

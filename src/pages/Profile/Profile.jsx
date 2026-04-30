@@ -4,6 +4,8 @@ import { auth, db } from "../../firebase/firebase";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { signOut } from "firebase/auth";
 import styles from "./Profile.module.css"; 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faHouse } from '@fortawesome/free-solid-svg-icons'
 
 function Profile({isOnboarding = false, isMetric = false}) {
     const [firstName, setFirstName] = useState("");
@@ -66,7 +68,17 @@ function Profile({isOnboarding = false, isMetric = false}) {
             }
         };
 
-  const handleLogout = async () => {
+    const dashboard = async () => {
+        try {
+            if (!isOnboarding) {
+                navigate("/dashboard")
+            }
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+
+    const handleLogout = async () => {
         try {
             await signOut(auth);
         } catch (error) {
@@ -147,7 +159,7 @@ function Profile({isOnboarding = false, isMetric = false}) {
                 <div className={styles.stats}>
                     <div className={styles.inputGroup}>
                         <label>Training Goal</label>
-                        <select value={goal} disabled={!isEditing} onChange={(e) => setGoal(e.target.value)}>
+                        <select className={styles.dropdown} value={goal} disabled={!isEditing} onChange={(e) => setGoal(e.target.value)}>
                             <option value="Hypertrophy">Hypertrophy (Muscle Gain)</option>
                             <option value="Strength">Strength (Powerlifting)</option>
                             <option value="Maintenance">Maintenance</option>
@@ -157,7 +169,7 @@ function Profile({isOnboarding = false, isMetric = false}) {
                     </div>
                     <div className={styles.inputGroup}>
                         <label>Activity Level</label>
-                        <select id="activityLevel" value={activityLevel} disabled={!isEditing} onChange={(e) => setActivityLevel(e.target.value)} className={styles.dropdown}>
+                        <select className={styles.dropdown} id="activityLevel" value={activityLevel} disabled={!isEditing} onChange={(e) => setActivityLevel(e.target.value)} className={styles.dropdown}>
                             <option value="Sedentary">Sedentary (Little to no exercise)</option>
                             <option value="Light">Light (Light exercise 1-3x per week or a Job where you spend time on your feet)</option>
                             <option value="Moderate">Moderate (Moderate exercise 3-5x per week)</option>
@@ -166,10 +178,10 @@ function Profile({isOnboarding = false, isMetric = false}) {
                         </select>
                     </div>
                 </div>
-            </div>
-            <div className={styles.stats}>
-                <button onClick={handleSave}>Save Profile</button>
-                <button onClick={handleLogout}>Logout</button>
+                <div className={styles.stats}>
+                    <button className={styles.save} onClick={handleSave}>Save Profile</button>
+                    <button className={styles.home} onClick={dashboard}>Home <FontAwesomeIcon icon={faHouse} /></button>
+                </div>
             </div>
         </div>
     </div>
