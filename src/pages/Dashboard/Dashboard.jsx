@@ -1,10 +1,33 @@
 import React from 'react';
+import styles from "./Dashboard.module.css";
+
 
 function Dashboard() {
     return (
         <div>
-            <h1>Home</h1>
-            <p>This is the Home Page</p>
+            <div className={styles.titleFlex}>
+                <h1>Good Morning User</h1>
+                <img src="" alt="Profile Image"/>
+            </div>
+            <div className={styles.midFlex}>
+                <div className={styles.todaysWorkout}>
+                    <div>Today's Workout Routine/Schedule</div>
+                </div>
+                <div className={styles.midFlexCol}>
+                    <div className={styles.tipOfTheDay}>
+                        <h3>Tip of the Day</h3>
+                        <p>Did you know that carbs are the best source to fuel your workout?</p>
+                    </div>
+                    <div className={styles.weeklyGraph}>
+                        <p>This Week</p>
+                        <div>Days</div>
+                    </div>
+                </div>
+            </div>
+            <div className={styles.bottomFlex}>
+
+            </div>
+            
             <nav>
                 <ul>
                     <li>Home</li>
