@@ -1,0 +1,13 @@
+.titleFlex h2 {
+    text-align: center;
+    position: relative;
+    padding-top: 50px;
+}
+
+.titleFlex img {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    width: 35px;
+    height: 35px;
+}

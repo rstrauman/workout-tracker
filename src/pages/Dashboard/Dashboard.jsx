@@ -1,13 +1,14 @@
 import React from 'react';
 import styles from "./Dashboard.module.css";
+import profile from "../../assets/Profile-Icon.png";
 
 
 function Dashboard() {
     return (
         <div>
             <div className={styles.titleFlex}>
-                <h1>Good Morning User</h1>
-                <img src="" alt="Profile Image"/>
+                <h2>Good Morning User</h2>
+                <img src={profile} alt="Profile Image"/>
             </div>
             <div className={styles.midFlex}>
                 <div className={styles.todaysWorkout}>
