@@ -38,7 +38,7 @@ A fitness-focused workout tracking application currently in development. The goa
 1. Clone the repository
 
 ```bash
-git clone YOUR_REPOSITORY_URL
+git clone https://github.com/rstrauman/workout-tracker.git
 ```
 
 2. Navigate to the project folder
