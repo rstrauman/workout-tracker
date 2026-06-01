@@ -28,7 +28,6 @@ function Dashboard() {
             <div className={styles.bottomFlex}>
 
             </div>
-            
             <nav>
                 <ul>
                     <li>Home</li>
