@@ -2,7 +2,7 @@ import styles from "./Login.module.css";
 import logo from "../../assets/SRP_Fitness_Logo.png";
 import darkGym from "../../assets/Gym_Background.png";
 
-function LoginForm({ setEmail, setPassword, handleLogin, toggle }) {
+function LoginForm({ setEmail, setPassword, handleLogin, handleForgotPassword, toggle }) {
   return (
     <div className={styles.formCard}>
         <img src={logo} alt="SRP Fitness Logo" className={styles.logo}/>
@@ -16,7 +16,7 @@ function LoginForm({ setEmail, setPassword, handleLogin, toggle }) {
             Don't have an account? <span onClick={toggle}>Sign up</span>
             </p>
             <p className={styles.toggleText}>
-            Forgot Password? Click <span onClick={toggle}>here</span> to reset your password.
+            Forgot Password? Click <span onClick={handleForgotPassword}>here</span> to reset your password.
             </p>
         </div>
         <div className={styles.rightImage}>

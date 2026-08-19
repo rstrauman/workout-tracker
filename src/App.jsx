@@ -8,6 +8,7 @@ import Verification from "./pages/Verification/Verification";
 import Profile from "./pages/Profile/Profile";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Workout from "./pages/Workout/Workout";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
     const [user, setUser] = useState(null);
@@ -30,14 +31,14 @@ function App() {
             user ? (user.emailVerified ? <Navigate to="/workout" /> : <Navigate to="/verify" />) : <Login />
             } />
 
-            <Route path="/verify" element={<Verification />} />
-            
-            <Route path="/onboarding" element={<Profile isOnboarding={true} />} />
-            <Route path="/profile" element={<Profile isOnboarding={false} />} />
-            <Route path="/dashboard" element={<Dashboard/>}/>
+            <Route path="/verify" element={<ProtectedRoute user={user}><Verification /></ProtectedRoute>} />
+
+            <Route path="/onboarding" element={<ProtectedRoute user={user}><Profile isOnboarding={true} /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute user={user}><Profile isOnboarding={false} /></ProtectedRoute>} />
+            <Route path="/dashboard" element={<ProtectedRoute user={user}><Dashboard/></ProtectedRoute>} />
             {/* <Route path="/onboarding" element={<Onboarding />} /> */}
-            
-            <Route path="/workout" element={<Workout />} />
+
+            <Route path="/workout" element={<ProtectedRoute user={user}><Workout /></ProtectedRoute>} />
             
             <Route path="*" element={<Navigate to="/" />} />
         </Routes>

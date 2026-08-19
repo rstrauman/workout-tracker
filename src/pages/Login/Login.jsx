@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { auth, db } from "../../firebase/firebase";
 import { doc, setDoc } from "firebase/firestore";
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, sendEmailVerification } from "firebase/auth";
-import { loginUser, registerUser } from "../../firebase/authService";
+import { createUserWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail } from "firebase/auth";
+import { loginUser } from "../../firebase/authService";
 import { useNavigate } from "react-router-dom";
 import LoginForm from "./Login-Form";
 import RegisterForm from "./Register";
@@ -42,14 +42,26 @@ function Login() {
         } catch (error) { alert(error.message); }
     };
 
+    const handleForgotPassword = async () => {
+        if (!email) {
+            alert("Enter your email above first, then click here to reset your password.");
+            return;
+        }
+        try {
+            await sendPasswordResetEmail(auth, email);
+            alert("Password reset email sent! Check your inbox.");
+        } catch (error) { alert(error.message); }
+    };
+
     return (
         <div className={styles.pageWrapper}>
             <div className={`${styles.formSlider} ${isLogin ? "" : styles.shifted}`}>
-                <LoginForm 
-                setEmail={setEmail} 
-                setPassword={setPassword} 
-                handleLogin={handleLogin} 
-                toggle={() => setIsLogin(false)} 
+                <LoginForm
+                setEmail={setEmail}
+                setPassword={setPassword}
+                handleLogin={handleLogin}
+                handleForgotPassword={handleForgotPassword}
+                toggle={() => setIsLogin(false)}
                 />
                 <RegisterForm 
                 setEmail={setEmail} 
