@@ -1,6 +1,6 @@
 import styles from "./Login.module.css";
-import logo from "../../assets/SRP_Fitness_Logo.png";
-import lightGym from "../../assets/Light-Gym.png";
+import logo from "../../assets/SRP_Fitness_Logo.webp";
+import lightGym from "../../assets/Light-Gym.webp";
 
 function RegisterForm({ setEmail, setPassword, handleSignup, toggle }) {
   return (

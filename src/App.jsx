@@ -1,19 +1,20 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { auth, db } from "./firebase/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 
-import Login from "./pages/Login/Login";
-import Verification from "./pages/Verification/Verification";
-import Profile from "./pages/Profile/Profile";
-import Dashboard from "./pages/Dashboard/Dashboard";
-import Workout from "./pages/Workout/Workout";
-import ComingSoon from "./pages/ComingSoon/ComingSoon";
-import NotFound from "./pages/NotFound/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AppSkeleton from "./components/AppSkeleton";
 import { faUtensils, faChartLine } from '@fortawesome/free-solid-svg-icons';
+
+const Login = lazy(() => import("./pages/Login/Login"));
+const Verification = lazy(() => import("./pages/Verification/Verification"));
+const Profile = lazy(() => import("./pages/Profile/Profile"));
+const Dashboard = lazy(() => import("./pages/Dashboard/Dashboard"));
+const Workout = lazy(() => import("./pages/Workout/Workout"));
+const ComingSoon = lazy(() => import("./pages/ComingSoon/ComingSoon"));
+const NotFound = lazy(() => import("./pages/NotFound/NotFound"));
 
 function App() {
     const [user, setUser] = useState(null);
@@ -45,6 +46,7 @@ function App() {
 
     return (
         <Router>
+        <Suspense fallback={<AppSkeleton />}>
         <Routes>
             <Route path="/" element={rootElement()} />
 
@@ -62,6 +64,7 @@ function App() {
 
             <Route path="*" element={<NotFound />} />
         </Routes>
+        </Suspense>
         </Router>
     );
 }

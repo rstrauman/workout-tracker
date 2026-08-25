@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import styles from "./NotFound.module.css";
-import logo from "../../assets/SRP_Fitness_Logo.png";
+import logo from "../../assets/SRP_Fitness_Logo.webp";
 
 function NotFound() {
     const navigate = useNavigate();

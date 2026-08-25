@@ -1,6 +1,6 @@
 import styles from "./Login.module.css";
-import logo from "../../assets/SRP_Fitness_Logo.png";
-import darkGym from "../../assets/Gym_Background.png";
+import logo from "../../assets/SRP_Fitness_Logo.webp";
+import darkGym from "../../assets/Gym_Background.webp";
 
 function LoginForm({ setEmail, setPassword, handleLogin, handleForgotPassword, toggle }) {
   return (

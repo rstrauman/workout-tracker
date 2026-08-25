@@ -18,7 +18,7 @@ Auth, the Dashboard home screen, and workout logging are all functional end-to-e
 - Stat tiles for workouts-this-week / day-streak / a locked "Macro Tracking — Coming Soon" tile.
 - Loading and empty states for brand-new users with no logged workouts.
 - Visual pass: blue/purple color-coded cards instead of one repeated accent, tightened spacing so it fits the viewport without scrolling.
-- Navbar wired to real routes with active-state highlighting; Meals/Progress tabs are present but inert (no pages exist yet).
+- Navbar wired to real routes with active-state highlighting, including Meals/Progress (see "Pages & polish" below).
 
 **Workout logging (`/workout`)**
 - Per-exercise cards with per-set rows (weight, reps, RIR, a complete checkbox), add/remove sets and exercises freely, optional notes per exercise.
@@ -38,22 +38,32 @@ Auth, the Dashboard home screen, and workout logging are all functional end-to-e
 
 **Deployment**
 - Added `hosting` config to `firebase.json` (`public: dist`, SPA rewrite to `index.html`) and deployed via `firebase deploy --only hosting`.
-- Live at https://workout-tracker-7dd87.web.app. It's an unlisted default `*.web.app` subdomain — fine for testing on your phone, but the site isn't polished for sharing yet (dead nav tabs, unoptimized images).
+- Live at https://workout-tracker-7dd87.web.app. It's an unlisted default `*.web.app` subdomain — fine for testing on your phone.
 - To redeploy after future changes: `npm run build` then `npx firebase deploy --only hosting`.
+
+**Pages & polish**
+- Meals/Progress nav tabs now link to real (placeholder) `/meals` and `/progress` routes rendering a shared `ComingSoon` component, instead of being inert.
+- Unmatched routes now hit a proper branded 404 page (`NotFound.jsx`) instead of silently redirecting to `/`.
+- Replaced plain "Loading..." text with shimmer skeleton placeholders — one for the app-startup auth check (`AppSkeleton.jsx`), one for the Dashboard's Firestore fetch (matches the real card layout so nothing jumps into place).
+
+**Performance**
+- Re-encoded the three oversized PNGs (logo, two hero/background photos) to WebP — went from ~6.1MB combined to ~196KB, no visible quality loss at their actual display sizes. Logo was also downscaled from 1536x1024 (needed at ~100px tall) to 449x299.
+- Deleted unused leftover image assets (old jpg drafts, a stray `Login.png`, Vite's default `react.svg`/`vite.svg`) that weren't imported anywhere — didn't affect the build, but decluttered the repo.
+- Route-level code splitting via `React.lazy` + `Suspense` (fallback: `AppSkeleton`) — each page is now its own small chunk instead of one ~690KB bundle loaded upfront regardless of which page you land on.
 
 ## What needs to be done / known gaps
 
-- **Meals & Progress** are nav placeholders only — no pages, no data model.
+- **Meals & Progress have no real scope yet** — they're a shared "Coming Soon" placeholder page, no actual data model or features designed.
 - **Macro tracking** is explicitly deferred (the Dashboard tile says so) — no design work started.
 - **Recent Activity is view-only** — no way to edit or delete a past workout from the Dashboard.
 - **Exercise picker is name-search only** — the wger data includes category/equipment/muscle group, but there's no filter/browse UI for it yet, just typeahead.
-- **Unoptimized image assets** — `Gym_Background.png` (~1.8MB), `Light-Gym.png` (~2MB), and the logo (~2.2MB) are the bulk of the build size.
-- **No code splitting** — single ~686KB JS chunk (~212KB gzip), Vite warns about it on every build.
+- **Not mobile-responsive yet** — works fine on desktop viewports, needs a real pass for phone screens.
 - **No tests** — no unit/integration coverage anywhere.
 - **Firestore rules don't validate write shape** — a user can write arbitrary fields/types to their own documents (low priority — it only affects their own data integrity, not other users).
+- The big remaining vendor JS chunk (~594KB, ~185KB gzip — React, react-router, Firebase, FontAwesome) still loads on every page since auth needs Firebase immediately; further splitting that would have diminishing returns for this app's size.
 
 ## What I'd move forward with next
 
-1. **Decide Meals/Progress scope** (or hide those nav tabs until they're real) rather than leaving dead placeholder taps in the nav indefinitely — matters more now that there's a live URL you might share.
-2. **Image optimization + code splitting** — cheap performance wins whenever you have a slow afternoon, not urgent.
+1. **Decide Meals/Progress scope** — what they'll actually track and how, now that the placeholder page exists.
+2. **Mobile responsiveness pass** now that there's a live URL to test on your phone.
 3. Once the above feels solid: revisit the **Expo/React Native** path we talked about for a real mobile app — the Firebase backend already works as-is for that, no backend changes needed, just a new UI layer that can reuse the existing service files (`authService.js`, `exerciseApi.js`).

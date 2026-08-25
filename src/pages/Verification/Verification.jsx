@@ -4,7 +4,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { useNavigate, useLocation } from "react-router-dom";
 
 import styles from "./Verification.module.css";
-import logo from "../../assets/SRP_Fitness_Logo.png";
+import logo from "../../assets/SRP_Fitness_Logo.webp";
 
 function VerifyEmail() {
     const navigate = useNavigate();

@@ -25,6 +25,12 @@
     flex-direction: column;
 }
 
+.verifyLogo {
+    height: 72px;
+    width: auto;
+    margin: 0 auto 12px;
+}
+
 h2 {
     font-size: 28px;
     letter-spacing: -0.5px;
