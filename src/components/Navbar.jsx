@@ -6,8 +6,8 @@ import styles from "../pages/Dashboard/Dashboard.module.css";
 const navItems = [
     { to: "/dashboard", label: "Home", icon: faHouse },
     { to: "/workout", label: "Workout", icon: faDumbbell },
-    { label: "Meals", icon: faUtensils, soon: true },
-    { label: "Progress", icon: faChartLine, soon: true },
+    { to: "/meals", label: "Meals", icon: faUtensils },
+    { to: "/progress", label: "Progress", icon: faChartLine },
     { to: "/profile", label: "Settings", icon: faGear },
 ];
 
@@ -16,22 +16,15 @@ function Navbar() {
         <nav className={styles.mainNav}>
             <ul>
                 {navItems.map((item) => (
-                    item.soon ? (
-                        <li key={item.label} className={styles.navSoon}>
+                    <li key={item.label}>
+                        <NavLink
+                            to={item.to}
+                            className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navActive : ""}`}
+                        >
                             <FontAwesomeIcon icon={item.icon} />
                             <p>{item.label}</p>
-                        </li>
-                    ) : (
-                        <li key={item.label}>
-                            <NavLink
-                                to={item.to}
-                                className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navActive : ""}`}
-                            >
-                                <FontAwesomeIcon icon={item.icon} />
-                                <p>{item.label}</p>
-                            </NavLink>
-                        </li>
-                    )
+                        </NavLink>
+                    </li>
                 ))}
             </ul>
         </nav>

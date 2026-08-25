@@ -1,0 +1,29 @@
+.centerWrap {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+}
+
+.card {
+    align-items: center;
+    text-align: center;
+    max-width: 320px;
+    padding: 32px 24px;
+}
+
+.icon {
+    font-size: 36px;
+    color: var(--accent-2-light);
+}
+
+.card h2 {
+    margin: 4px 0 0;
+}
+
+.description {
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0;
+}

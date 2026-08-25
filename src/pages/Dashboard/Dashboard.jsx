@@ -136,7 +136,10 @@ function Dashboard() {
                                     )}
                                 </div>
                                 {loading ? (
-                                    <p className={styles.emptyText}>Loading...</p>
+                                    <div className={styles.workoutList}>
+                                        <div className={`${styles.skeleton} ${styles.skeletonRow}`}></div>
+                                        <div className={`${styles.skeleton} ${styles.skeletonRow}`}></div>
+                                    </div>
                                 ) : todaysWorkout ? (
                                     <div className={styles.workoutList}>
                                         {todaysWorkout.exercises.map((ex, i) => (
@@ -168,17 +171,30 @@ function Dashboard() {
                                 <div className={`${styles.card} ${styles.cardBlue}`}>
                                     <div className={styles.cardHeader}>
                                         <h3>This Week</h3>
-                                        <span className={styles.streakText}>
-                                            <FontAwesomeIcon icon={faFire} /> {streak} day{streak !== 1 ? "s" : ""}
-                                        </span>
+                                        {loading ? (
+                                            <div className={styles.skeleton} style={{ width: 56, height: 16 }}></div>
+                                        ) : (
+                                            <span className={styles.streakText}>
+                                                <FontAwesomeIcon icon={faFire} /> {streak} day{streak !== 1 ? "s" : ""}
+                                            </span>
+                                        )}
                                     </div>
                                     <div className={styles.graphBars}>
-                                        {weekDays.map((d, i) => (
-                                            <div className={styles.dayCol} key={i}>
-                                                <div className={`${styles.bar} ${d.done ? styles.barDone : ""}`}></div>
-                                                <span>{d.label}</span>
-                                            </div>
-                                        ))}
+                                        {loading ? (
+                                            DAY_LABELS.map((label, i) => (
+                                                <div className={styles.dayCol} key={i}>
+                                                    <div className={`${styles.skeleton} ${styles.skeletonBar}`}></div>
+                                                    <span>{label}</span>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            weekDays.map((d, i) => (
+                                                <div className={styles.dayCol} key={i}>
+                                                    <div className={`${styles.bar} ${d.done ? styles.barDone : ""}`}></div>
+                                                    <span>{d.label}</span>
+                                                </div>
+                                            ))
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -187,11 +203,19 @@ function Dashboard() {
 
                     <div className={styles.bottomFlex}>
                         <div className={`${styles.card} ${styles.statCard}`}>
-                            <span className={styles.statValue}>{completedThisWeek}</span>
+                            {loading ? (
+                                <div className={`${styles.skeleton} ${styles.skeletonValue}`}></div>
+                            ) : (
+                                <span className={styles.statValue}>{completedThisWeek}</span>
+                            )}
                             <span className={styles.statLabel}>Workouts this week</span>
                         </div>
                         <div className={`${styles.card} ${styles.statCard}`}>
-                            <span className={`${styles.statValue} ${styles.statValueAmber}`}>{streak}</span>
+                            {loading ? (
+                                <div className={`${styles.skeleton} ${styles.skeletonValue}`}></div>
+                            ) : (
+                                <span className={`${styles.statValue} ${styles.statValueAmber}`}>{streak}</span>
+                            )}
                             <span className={styles.statLabel}>Day streak</span>
                         </div>
                         <div className={`${styles.card} ${styles.statCard} ${styles.cardPurple} ${styles.comingSoon}`}>
@@ -205,7 +229,11 @@ function Dashboard() {
                         <div className={`${styles.card} ${styles.cardPurple}`}>
                             <h3><FontAwesomeIcon icon={faListCheck} className={styles.headerIconPurple} /> Recent Activity</h3>
                             {loading ? (
-                                <p className={styles.emptyText}>Loading...</p>
+                                <div className={styles.activityList}>
+                                    <div className={`${styles.skeleton} ${styles.skeletonRow}`}></div>
+                                    <div className={`${styles.skeleton} ${styles.skeletonRow}`}></div>
+                                    <div className={`${styles.skeleton} ${styles.skeletonRow}`}></div>
+                                </div>
                             ) : recentActivity.length ? (
                                 <div className={styles.activityList}>
                                     {recentActivity.map((entry) => (

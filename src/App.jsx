@@ -9,7 +9,11 @@ import Verification from "./pages/Verification/Verification";
 import Profile from "./pages/Profile/Profile";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Workout from "./pages/Workout/Workout";
+import ComingSoon from "./pages/ComingSoon/ComingSoon";
+import NotFound from "./pages/NotFound/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AppSkeleton from "./components/AppSkeleton";
+import { faUtensils, faChartLine } from '@fortawesome/free-solid-svg-icons';
 
 function App() {
     const [user, setUser] = useState(null);
@@ -30,7 +34,7 @@ function App() {
         return () => unsubscribe();
     }, []);
 
-    if (loading) return <h2 style={{color: 'white', textAlign: 'center'}}>Loading...</h2>;
+    if (loading) return <AppSkeleton />;
 
     const rootElement = () => {
         if (!user) return <Login />;
@@ -52,8 +56,11 @@ function App() {
             {/* <Route path="/onboarding" element={<Onboarding />} /> */}
 
             <Route path="/workout" element={<ProtectedRoute user={user}><Workout /></ProtectedRoute>} />
-            
-            <Route path="*" element={<Navigate to="/" />} />
+
+            <Route path="/meals" element={<ProtectedRoute user={user}><ComingSoon title="Meals" icon={faUtensils} description="Meal logging and macro tracking are on the way." /></ProtectedRoute>} />
+            <Route path="/progress" element={<ProtectedRoute user={user}><ComingSoon title="Progress" icon={faChartLine} description="Long-term progress charts and PR tracking are on the way." /></ProtectedRoute>} />
+
+            <Route path="*" element={<NotFound />} />
         </Routes>
         </Router>
     );
