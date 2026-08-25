@@ -32,10 +32,12 @@ Auth, the Dashboard home screen, and workout logging are all functional end-to-e
 - Bumped `react-router-dom` 7.14.2 → 7.18.2 (patches an open-redirect and a DoS advisory that were actually in the shipped bundle — traced the rest of `npm audit`'s findings to dev-only/unshipped code, no action needed there).
 - Removed dead `registerUser` export and unused imports from the auth layer.
 
+**Routing fixes**
+- `App.jsx`'s root route now checks `isProfileComplete` from Firestore and sends users to `/onboarding` or `/dashboard` accordingly (previously always sent verified users to `/workout`, and never checked onboarding status).
+- `Verification.jsx`'s "I've Verified" button now checks `isProfileComplete` itself and navigates directly to `/onboarding` or `/dashboard` — it can't rely on `App.jsx`'s state because `auth.currentUser.reload()` doesn't trigger `onAuthStateChanged`, so the root route's cached user object would still look unverified right after clicking.
+
 ## What needs to be done / known gaps
 
-- **Root redirect is stale**: `App.jsx` sends verified users to `/workout` on login, not `/dashboard` — probably a leftover from before Dashboard existed as the real home screen. Quick fix.
-- **Onboarding isn't actually enforced**: signup sets `isProfileComplete: false`, but nothing in the routing ever checks it or routes new users through `/onboarding`. `Verification.jsx` sends freshly-verified users to `/profile` (view mode, `isOnboarding={false}`) rather than `/onboarding` (edit mode) — new users likely land on a mostly-empty read-only profile page.
 - **Meals & Progress** are nav placeholders only — no pages, no data model.
 - **Macro tracking** is explicitly deferred (the Dashboard tile says so) — no design work started.
 - **Recent Activity is view-only** — no way to edit or delete a past workout from the Dashboard.
@@ -48,8 +50,7 @@ Auth, the Dashboard home screen, and workout logging are all functional end-to-e
 
 ## What I'd move forward with next
 
-1. **Fix the two routing gaps above** (stale `/workout` redirect, unenforced onboarding) — small, closes a real UX hole, good first task next session.
-2. **Deploy to Firebase Hosting.** Right now this only exists as `npm run dev` on your machine — a real URL means you can actually test it on your phone, which matters a lot once mobile is on the table.
-3. **Decide Meals/Progress scope** (or hide those nav tabs until they're real) rather than leaving dead placeholder taps in the nav indefinitely.
-4. **Image optimization + code splitting** — cheap performance wins whenever you have a slow afternoon, not urgent.
-5. Once the above feels solid: revisit the **Expo/React Native** path we talked about for a real mobile app — the Firebase backend already works as-is for that, no backend changes needed, just a new UI layer that can reuse the existing service files (`authService.js`, `exerciseApi.js`).
+1. **Deploy to Firebase Hosting.** Right now this only exists as `npm run dev` on your machine — a real URL means you can actually test it on your phone, which matters a lot once mobile is on the table.
+2. **Decide Meals/Progress scope** (or hide those nav tabs until they're real) rather than leaving dead placeholder taps in the nav indefinitely.
+3. **Image optimization + code splitting** — cheap performance wins whenever you have a slow afternoon, not urgent.
+4. Once the above feels solid: revisit the **Expo/React Native** path we talked about for a real mobile app — the Firebase backend already works as-is for that, no backend changes needed, just a new UI layer that can reuse the existing service files (`authService.js`, `exerciseApi.js`).

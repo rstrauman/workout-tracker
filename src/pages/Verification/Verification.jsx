@@ -1,5 +1,6 @@
-import { auth } from "../../firebase/firebase";
+import { auth, db } from "../../firebase/firebase";
 import { sendEmailVerification } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 import { useNavigate, useLocation } from "react-router-dom";
 
 import styles from "./Verification.module.css";
@@ -16,7 +17,9 @@ function VerifyEmail() {
         await auth.currentUser.reload();
     
         if (auth.currentUser.emailVerified) {
-            navigate("/profile");
+            const userDoc = await getDoc(doc(db, "users", auth.currentUser.uid));
+            const isProfileComplete = userDoc.exists() && userDoc.data().isProfileComplete === true;
+            navigate(isProfileComplete ? "/dashboard" : "/onboarding");
         } else {
             alert("Email not verified yet. Please check your inbox!");
         }
