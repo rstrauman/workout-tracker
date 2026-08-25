@@ -31,6 +31,9 @@ Auth, the Dashboard home screen, and workout logging are all functional end-to-e
 - Versioned those rules into the repo (`firestore.rules`, `firebase.json`, `.firebaserc`) so future changes go through `firebase deploy --only firestore:rules` instead of being edited live in the console.
 - Bumped `react-router-dom` 7.14.2 → 7.18.2 (patches an open-redirect and a DoS advisory that were actually in the shipped bundle — traced the rest of `npm audit`'s findings to dev-only/unshipped code, no action needed there).
 - Removed dead `registerUser` export and unused imports from the auth layer.
+- Checked full git history for leaked secrets (private keys, service account files, `.env`, Stripe/AWS-style keys) — found nothing. The Firebase Web SDK config (`apiKey` etc. in `firebase.js`) is not a secret; Google documents it as safe to ship client-side. Real access control is the Firestore rules above, not that key.
+- Added write-shape validation to `firestore.rules`: `users/{uid}` and `users/{uid}/workouts/{id}` now reject unknown top-level fields and wrong types (e.g. `weight` must be a number, can't add junk fields like `isAdmin`), on top of the existing per-owner access scoping. Can't validate individual array items (e.g. each set inside `exercises`) — Firestore rules have no loop/iteration construct, so that's validated at the top level (`exercises is list`) only. Tested against the Firestore emulator with `@firebase/rules-unit-testing` (installed temporarily, not a project dependency) covering both the app's real write shapes and rejected cases (cross-user writes, junk fields, wrong types) — all 10 cases passed before deploying.
+- Added an `emulators.firestore` block to `firebase.json` (port 8080) so future rules changes can be tested locally via `firebase emulators:exec` instead of trusting a dry-run compile alone.
 
 **Routing fixes**
 - `App.jsx`'s root route now checks `isProfileComplete` from Firestore and sends users to `/onboarding` or `/dashboard` accordingly (previously always sent verified users to `/workout`, and never checked onboarding status).
@@ -58,8 +61,9 @@ Auth, the Dashboard home screen, and workout logging are all functional end-to-e
 - **Recent Activity is view-only** — no way to edit or delete a past workout from the Dashboard.
 - **Exercise picker is name-search only** — the wger data includes category/equipment/muscle group, but there's no filter/browse UI for it yet, just typeahead.
 - **Not mobile-responsive yet** — works fine on desktop viewports, needs a real pass for phone screens.
-- **No tests** — no unit/integration coverage anywhere.
-- **Firestore rules don't validate write shape** — a user can write arbitrary fields/types to their own documents (low priority — it only affects their own data integrity, not other users).
+- **No tests** — no unit/integration coverage anywhere (the new Firestore rules test is a one-off script, not a checked-in suite).
+- **Firebase API key isn't restricted in Google Cloud Console** — not a secret, so this is a "reduce blast radius" item rather than a real vulnerability. Restricting it to your domain + specific APIs (Cloud Console → APIs & Services → Credentials) means nobody could reuse a copied key against unrelated Google APIs on your billing account. This is a console action on your account, not something doable via CLI/code.
+- Workout set fields (`weight`, `reps`, `rir` in `Workout.jsx`) are saved as strings, not numbers — `updateSet` never casts the input value. Not a security issue (rules now correctly require `is string` to match reality), but worth knowing if you ever want to do numeric aggregation/sorting on set data.
 - The big remaining vendor JS chunk (~594KB, ~185KB gzip — React, react-router, Firebase, FontAwesome) still loads on every page since auth needs Firebase immediately; further splitting that would have diminishing returns for this app's size.
 
 ## What I'd move forward with next

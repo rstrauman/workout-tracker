@@ -2,9 +2,44 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Matches any document in the 'users' collection or its subcollections
-    match /users/{userId}/{document=**} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    function isValidUserDoc(data) {
+      return data.keys().hasOnly([
+               'email', 'createdAt', 'updatedAt', 'isProfileComplete',
+               'firstName', 'lastName', 'weight', 'height', 'tel', 'goal', 'activityLevel'
+             ])
+             && data.email is string
+             && data.isProfileComplete is bool
+             && (!('createdAt' in data) || data.createdAt is timestamp)
+             && (!('updatedAt' in data) || data.updatedAt is timestamp)
+             && (!('firstName' in data) || data.firstName is string)
+             && (!('lastName' in data) || data.lastName is string)
+             && (!('weight' in data) || data.weight is number)
+             && (!('height' in data) || data.height is number)
+             && (!('tel' in data) || data.tel is string)
+             && (!('goal' in data) || data.goal is string)
+             && (!('activityLevel' in data) || data.activityLevel is string);
+    }
+
+    function isValidWorkout(data) {
+      return data.keys().hasOnly(['date', 'durationSeconds', 'exercises'])
+             && data.date is timestamp
+             && data.durationSeconds is number
+             && data.exercises is list;
+    }
+
+    match /users/{userId} {
+      allow read, delete: if isOwner(userId);
+      allow create, update: if isOwner(userId) && isValidUserDoc(request.resource.data);
+
+      match /workouts/{workoutId} {
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidWorkout(request.resource.data);
+      }
     }
   }
 }
