@@ -10,7 +10,7 @@ service cloud.firestore {
     function isValidUserDoc(data) {
       return data.keys().hasOnly([
                'email', 'createdAt', 'updatedAt', 'isProfileComplete',
-               'firstName', 'lastName', 'weight', 'height', 'tel', 'goal', 'activityLevel'
+               'firstName', 'lastName', 'weight', 'height', 'tel', 'goal', 'activityLevel', 'unitSystem'
              ])
              && data.email is string
              && data.isProfileComplete is bool
@@ -22,7 +22,8 @@ service cloud.firestore {
              && (!('height' in data) || data.height is number)
              && (!('tel' in data) || data.tel is string)
              && (!('goal' in data) || data.goal is string)
-             && (!('activityLevel' in data) || data.activityLevel is string);
+             && (!('activityLevel' in data) || data.activityLevel is string)
+             && (!('unitSystem' in data) || data.unitSystem in ['imperial', 'metric']);
     }
 
     function isValidWorkout(data) {

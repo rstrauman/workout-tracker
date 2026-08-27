@@ -139,6 +139,62 @@
     width: 100%;
 }
 
+.unitToggle {
+    display: flex;
+    width: 100%;
+    border: 1px solid var(--text-muted);
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.unitToggle button {
+    flex: 1;
+    padding: 10px 16px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 550;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.unitToggle button:disabled {
+    cursor: default;
+}
+
+.unitToggle .unitActive {
+    background: var(--accent);
+    color: #fff;
+}
+
+.heightImperial {
+    display: flex;
+    gap: 10px;
+}
+
+.heightImperial .inputWithUnit {
+    flex: 1;
+}
+
+.inputWithUnit {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.inputWithUnit input {
+    flex: 1;
+    min-width: 0;
+}
+
+.unitSuffix {
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
 .dropdown {
     width: 100%; 
 }
