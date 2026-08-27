@@ -8,6 +8,8 @@ import LoginForm from "./Login-Form";
 import RegisterForm from "./Register";
 import styles from "./Login.module.css";
 
+const PASSWORD_POLICY = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+
 function Login() {
     const [isLogin, setIsLogin] = useState(true); 
     const [email, setEmail] = useState("");
@@ -24,6 +26,12 @@ function Login() {
 
     const handleSignup = async (e) => {
         e.preventDefault();
+
+        if (!PASSWORD_POLICY.test(password)) {
+            alert("Password must be at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a special character.");
+            return;
+        }
+
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
