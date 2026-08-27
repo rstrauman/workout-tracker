@@ -4,6 +4,7 @@ import profile from "../../assets/Profile-Icon.png";
 import Navbar from '../../components/Navbar';
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../../firebase/firebase";
+import { signOut } from "firebase/auth";
 import { collection, query, where, orderBy, getDocs, Timestamp } from "firebase/firestore";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDumbbell, faFire, faLightbulb, faChevronRight, faLock, faListCheck, faClock } from '@fortawesome/free-solid-svg-icons';
@@ -38,6 +39,15 @@ function Dashboard() {
     const navigate = useNavigate();
     const [workouts, setWorkouts] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [menuOpen, setMenuOpen] = useState(false);
+
+    const handleLogout = async () => {
+        try {
+            await signOut(auth);
+        } catch (error) {
+            alert(error.message);
+        }
+    };
 
     useEffect(() => {
         const fetchWorkouts = async () => {
@@ -120,7 +130,21 @@ function Dashboard() {
                             {today.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
                         </p>
                     </div>
-                    <img src={profile} alt="Profile Image" onClick={() => navigate('/profile')} />
+                    <div className={styles.profileMenuWrap}>
+                        <img
+                            src={profile}
+                            alt="Profile Image"
+                            tabIndex={0}
+                            onClick={() => setMenuOpen((open) => !open)}
+                            onBlur={() => setMenuOpen(false)}
+                        />
+                        {menuOpen && (
+                            <div className={styles.profileMenu}>
+                                <button onMouseDown={() => navigate('/profile')}>Edit Profile</button>
+                                <button onMouseDown={handleLogout}>Log Out</button>
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 <div className={styles.contentSections}>

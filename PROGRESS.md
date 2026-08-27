@@ -19,6 +19,7 @@ Auth, the Dashboard home screen, and workout logging are all functional end-to-e
 - Loading and empty states for brand-new users with no logged workouts.
 - Visual pass: blue/purple color-coded cards instead of one repeated accent, tightened spacing so it fits the viewport without scrolling.
 - Navbar wired to real routes with active-state highlighting, including Meals/Progress (see "Pages & polish" below).
+- The header avatar is now a dropdown (Edit Profile / Log Out) instead of a direct link to `/profile` — built to be extensible as more account-level actions come up. Note: `Profile.jsx` still has its own separate, still-unused `handleLogout` (the source of a lingering unused-var lint warning) — this new one lives in `Dashboard.jsx` instead; worth wiring up or removing the `Profile.jsx` one at some point.
 
 **Workout logging (`/workout`)**
 - Per-exercise cards with per-set rows (weight, reps, RIR, a complete checkbox), add/remove sets and exercises freely, optional notes per exercise.
