@@ -23,11 +23,14 @@ function App() {
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+            setLoading(true);
             setUser(currentUser);
 
             if (currentUser && currentUser.emailVerified) {
                 const userDoc = await getDoc(doc(db, "users", currentUser.uid));
                 setProfileComplete(userDoc.exists() && userDoc.data().isProfileComplete === true);
+            } else {
+                setProfileComplete(false);
             }
 
             setLoading(false);
