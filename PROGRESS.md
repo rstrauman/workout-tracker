@@ -72,6 +72,9 @@ Auth, the Dashboard home screen, and workout logging are all functional end-to-e
 - Unmatched routes now hit a proper branded 404 page (`NotFound.jsx`) instead of silently redirecting to `/`.
 - Replaced plain "Loading..." text with shimmer skeleton placeholders — one for the app-startup auth check (`AppSkeleton.jsx`), one for the Dashboard's Firestore fetch (matches the real card layout so nothing jumps into place).
 
+**Recent Activity delete**
+- Added a delete button (with confirm prompt) to each Recent Activity row on the Dashboard, calling `deleteDoc` on that workout. No rules change needed — `firestore.rules` already granted `delete` to the owning user. Editing a past workout is still not possible, only deleting.
+
 **Performance**
 - Re-encoded the three oversized PNGs (logo, two hero/background photos) to WebP — went from ~6.1MB combined to ~196KB, no visible quality loss at their actual display sizes. Logo was also downscaled from 1536x1024 (needed at ~100px tall) to 449x299.
 - Deleted unused leftover image assets (old jpg drafts, a stray `Login.png`, Vite's default `react.svg`/`vite.svg`) that weren't imported anywhere — didn't affect the build, but decluttered the repo.
@@ -81,7 +84,7 @@ Auth, the Dashboard home screen, and workout logging are all functional end-to-e
 
 - **Meals & Progress have no real scope yet** — they're a shared "Coming Soon" placeholder page, no actual data model or features designed.
 - **Macro tracking** is explicitly deferred (the Dashboard tile says so) — no design work started.
-- **Recent Activity is view-only** — no way to edit or delete a past workout from the Dashboard.
+- **Recent Activity can be deleted but not edited** — no way to fix a mislogged past workout, only remove it entirely.
 - **Exercise picker is name-search only** — the wger data includes category/equipment/muscle group, but there's no filter/browse UI for it yet, just typeahead.
 - **Not mobile-responsive yet** — works fine on desktop viewports, needs a real pass for phone screens.
 - **No tests** — no unit/integration coverage anywhere (the new Firestore rules test is a one-off script, not a checked-in suite).

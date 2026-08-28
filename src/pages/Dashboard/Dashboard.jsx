@@ -5,9 +5,9 @@ import Navbar from '../../components/Navbar';
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../../firebase/firebase";
 import { signOut } from "firebase/auth";
-import { collection, query, where, orderBy, getDocs, Timestamp } from "firebase/firestore";
+import { collection, doc, deleteDoc, query, where, orderBy, getDocs, Timestamp } from "firebase/firestore";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDumbbell, faFire, faLightbulb, faChevronRight, faLock, faListCheck, faClock } from '@fortawesome/free-solid-svg-icons';
+import { faDumbbell, faFire, faLightbulb, faChevronRight, faLock, faListCheck, faClock, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 const DAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
 
@@ -44,6 +44,16 @@ function Dashboard() {
     const handleLogout = async () => {
         try {
             await signOut(auth);
+        } catch (error) {
+            alert(error.message);
+        }
+    };
+
+    const handleDeleteWorkout = async (workoutId) => {
+        if (!window.confirm("Delete this workout? This can't be undone.")) return;
+        try {
+            await deleteDoc(doc(db, "users", auth.currentUser.uid, "workouts", workoutId));
+            setWorkouts((prev) => prev.filter((w) => w.id !== workoutId));
         } catch (error) {
             alert(error.message);
         }
@@ -267,6 +277,13 @@ function Dashboard() {
                                             <span className={styles.activityDuration}>
                                                 <FontAwesomeIcon icon={faClock} /> {entry.duration}
                                             </span>
+                                            <button
+                                                className={styles.deleteActivityBtn}
+                                                onClick={() => handleDeleteWorkout(entry.id)}
+                                                aria-label="Delete workout"
+                                            >
+                                                <FontAwesomeIcon icon={faTrash} />
+                                            </button>
                                         </div>
                                     ))}
                                 </div>

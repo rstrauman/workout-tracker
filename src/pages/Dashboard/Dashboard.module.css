@@ -443,6 +443,25 @@ body {
     text-align: left;
 }
 
+.deleteActivityBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.15s ease-in-out;
+}
+
+.deleteActivityBtn:hover {
+    color: #ff2c2c;
+    background: rgba(255, 44, 44, 0.1);
+}
+
 .activityDuration {
     display: flex;
     align-items: center;
