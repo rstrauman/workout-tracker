@@ -21,6 +21,7 @@ function Navbar() {
                             to={item.to}
                             className={({ isActive }) => `${styles.navItem} ${isActive ? styles.navActive : ""}`}
                         >
+                            <span className={styles.navIndicator}></span>
                             <FontAwesomeIcon icon={item.icon} />
                             <p>{item.label}</p>
                         </NavLink>

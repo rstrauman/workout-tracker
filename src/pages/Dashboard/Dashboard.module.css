@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap');
+
 /* ==========================================================================
    1. VARIABLES & GLOBAL BASICS
    ========================================================================== */
@@ -28,7 +30,7 @@ body {
 
 
 /* ==========================================================================
-   2. MAIN SITE LAYOUT (Containers & Structure)
+   2. SHARED SHELL (used by Dashboard, ComingSoon, AppSkeleton, Navbar)
    ========================================================================== */
 .main {
     display: flex;
@@ -49,148 +51,40 @@ body {
     padding: 0 20px 14px;
     overflow-y: auto;
     min-height: 0;
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    box-sizing: border-box;
 }
 
-.contentSections {
+@media (min-width: 720px) {
+    .scrollArea {
+        max-width: 1100px;
+    }
+}
+
+.topGrid {
     display: flex;
     flex-direction: column;
-    flex: 1;
-    justify-content: space-evenly;
-    gap: 14px;
-    min-height: 0;
-}
-
-/* Header Section */
-.titleFlex {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-top: 16px;
-}
-
-.titleFlex h2 {
-    margin: 0;
-    text-align: left;
-}
-
-.dateText {
-    margin: 4px 0 0;
-    color: var(--text-muted);
-    font-size: 14px;
-}
-
-.titleFlex img {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    border: 2px solid var(--accent);
-    cursor: pointer;
-    transition: transform 0.25s ease-in-out;
-}
-
-.titleFlex img:hover {
-    transform: scale(1.08);
-    border-color: var(--accent-light);
-}
-
-.profileMenuWrap {
-    position: relative;
-}
-
-.profileMenu {
-    position: absolute;
-    top: calc(100% + 8px);
-    right: 0;
-    display: flex;
-    flex-direction: column;
-    min-width: 160px;
-    background: var(--bg-surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
-    overflow: hidden;
-    z-index: 10;
-}
-
-.profileMenu button {
-    padding: 12px 16px;
-    background: none;
-    border: none;
-    color: var(--text-main);
-    font-size: 14px;
-    font-weight: 500;
-    text-align: left;
-    cursor: pointer;
-    transition: background 0.15s ease-in-out;
-}
-
-.profileMenu button:hover {
-    background: var(--bg-surface-2);
-    color: var(--accent-light);
-}
-
-.profileMenu button + button {
-    border-top: 1px solid var(--border);
-}
-
-/* Dashboard Mid Section Split */
-.midFlex {
-    display: flex;
-    justify-content: space-evenly;
     gap: 14px;
 }
 
-.midFlexCol {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    gap: 14px;
+@media (min-width: 720px) {
+    .topGrid {
+        display: grid;
+        grid-template-columns: 1.3fr 1fr;
+        grid-template-areas:
+            "hero weekly"
+            "hero tip";
+        gap: 14px;
+    }
+
+    .topGrid > .heroCard { grid-area: hero; }
+    .topGrid > .weeklyCard { grid-area: weekly; }
+    .topGrid > .tipBanner { grid-area: tip; }
 }
 
-.todaysWorkout {
-    flex: 1.2;
-    display: flex;
-}
-
-.todaysWorkout .card {
-    width: 100%;
-}
-
-.tipOfTheDay, .weeklyGraph {
-    display: flex;
-}
-
-.tipOfTheDay .card, .weeklyGraph .card {
-    width: 100%;
-}
-
-.tipOfTheDay {
-    flex: 1;
-}
-
-.weeklyGraph {
-    flex: 1.3;
-}
-
-/* Bottom Section */
-.bottomFlex {
-    display: flex;
-    gap: 14px;
-}
-
-/* Recent Activity Section */
-.recentActivity {
-    display: flex;
-}
-
-.recentActivity .card {
-    width: 100%;
-}
-
-
-/* ==========================================================================
-   3. REUSABLE COMPONENT STYLES (Cards)
-   ========================================================================== */
+/* Generic card, used by ComingSoon's placeholder card */
 .card {
     display: flex;
     flex-direction: column;
@@ -204,77 +98,16 @@ body {
     overflow: hidden;
 }
 
-.cardBlue {
-    border-left: 3px solid var(--accent);
-}
-
 .cardPurple {
     border-left: 3px solid var(--accent-2);
 }
 
-.card h3 {
-    margin: 0;
-    font-size: 15px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.headerIcon {
-    color: var(--accent-light);
-}
-
-.headerIconPurple {
+.soonBadge {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     color: var(--accent-2-light);
-}
-
-.cardHeader {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.badge {
-    background: var(--accent-bg);
-    color: var(--accent-light);
-    font-size: 12px;
-    font-weight: 600;
-    padding: 4px 10px;
-    border-radius: 20px;
-    border: 1px solid var(--accent-border);
-}
-
-/* Today's Workout */
-.workoutList {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    flex: 1;
-}
-
-.workoutItem {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 12px;
-    background: var(--bg-surface-2);
-    border-radius: 8px;
-    border-left: 3px solid var(--accent);
-    transition: all 0.2s ease-in-out;
-}
-
-.workoutItem:hover {
-    border-left-color: var(--accent-light);
-    transform: translateX(2px);
-}
-
-.exerciseName {
-    font-weight: 600;
-}
-
-.exerciseDetail {
-    color: var(--text-muted);
-    font-size: 13px;
+    font-weight: 700;
 }
 
 .startBtn {
@@ -310,178 +143,12 @@ body {
     margin: 0;
 }
 
-/* Tip of the Day */
-.tipOfTheDay .card p {
-    color: var(--text-muted);
-    font-size: 14px;
-    line-height: 1.5;
-    margin: 0;
-}
-
-/* Weekly Graph */
-.streakText {
-    color: var(--warning);
-    font-size: 13px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.graphBars {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    flex: 1;
-    gap: 6px;
-}
-
-.dayCol {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    flex: 1;
-}
-
-.bar {
-    width: 100%;
-    height: 32px;
-    background: var(--bg-surface-2);
-    border-radius: 6px;
-    border: 1px solid var(--border);
-    transition: all 0.2s ease-in-out;
-}
-
-.barDone {
-    background: linear-gradient(180deg, var(--accent-light), var(--accent));
-    border-color: var(--accent);
-}
-
-.dayCol span {
-    font-size: 12px;
-    color: var(--text-muted);
-}
-
-/* Bottom Stat Cards */
-.statCard {
-    flex: 1;
-    align-items: center;
-    text-align: center;
-    justify-content: center;
-    gap: 6px;
-}
-
-.statValue {
-    font-size: 26px;
-    font-weight: 700;
-    background: linear-gradient(90deg, var(--accent-light), var(--accent));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-}
-
-.statValueAmber {
-    background: linear-gradient(90deg, #fbbf24, var(--warning));
-    -webkit-background-clip: text;
-    background-clip: text;
-}
-
-.statLabel {
-    font-size: 12px;
-    color: var(--text-muted);
-}
-
-.comingSoon {
-    opacity: 0.8;
-}
-
-.lockIcon {
-    color: var(--accent-2-light);
-    font-size: 18px;
-}
-
-.soonBadge {
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--accent-2-light);
-    font-weight: 700;
-}
-
-/* Recent Activity */
-.activityList {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.activityItem {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 9px 14px;
-    background: var(--bg-surface-2);
-    border-radius: 8px;
-    transition: all 0.2s ease-in-out;
-}
-
-.activityItem:hover {
-    transform: translateX(2px);
-}
-
-.activityDate {
-    font-weight: 600;
-    font-size: 13px;
-    min-width: 90px;
-}
-
-.activitySummary {
-    flex: 1;
-    color: var(--text-muted);
-    font-size: 13px;
-    text-align: left;
-}
-
-.deleteActivityBtn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    cursor: pointer;
-    border-radius: 6px;
-    transition: all 0.15s ease-in-out;
-}
-
-.deleteActivityBtn:hover {
-    color: #ff2c2c;
-    background: rgba(255, 44, 44, 0.1);
-}
-
-.activityDuration {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--accent-2-light);
-    background: var(--accent-2-bg);
-    border: 1px solid var(--accent-2-border);
-    padding: 4px 10px;
-    border-radius: 20px;
-    white-space: nowrap;
-}
-
 
 /* ==========================================================================
-   4. SKELETON LOADING
+   3. SKELETON SHIMMER (shared primitive)
    ========================================================================== */
 .skeleton {
-    background: linear-gradient(90deg, var(--bg-surface-2) 25%, #3a3a3a 37%, var(--bg-surface-2) 63%);
+    background: linear-gradient(90deg, var(--dbBgCard2, var(--bg-surface-2)) 25%, #3a3a3a 37%, var(--dbBgCard2, var(--bg-surface-2)) 63%);
     background-size: 400% 100%;
     animation: skeletonShimmer 1.4s ease infinite;
     border-radius: 6px;
@@ -492,63 +159,18 @@ body {
     100% { background-position: 0 50%; }
 }
 
-.skeletonRow {
-    height: 36px;
-    width: 100%;
-}
-
-.skeletonBar {
-    width: 100%;
-    height: 32px;
-}
-
-.skeletonValue {
-    height: 26px;
-    width: 48px;
-    margin: 0 auto;
-}
-
-.skeletonTitle {
-    width: 160px;
-    height: 22px;
-}
-
-.skeletonSubtitle {
-    width: 120px;
-    height: 14px;
-    margin-top: 6px;
-}
-
-.skeletonAvatar {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-}
-
-.skeletonHeading {
-    width: 60%;
-    height: 18px;
-}
-
-.skeletonBlock {
-    width: 100%;
-    height: 40px;
-}
-
-.skeletonGraphBlock {
-    width: 100%;
-    height: 60px;
-}
 
 /* ==========================================================================
-   5. NAVIGATION BAR
+   4. NAVIGATION BAR (shared, used on every page via Navbar.jsx)
    ========================================================================== */
 .mainNav {
     display: flex;
     place-items: center;
     flex-shrink: 0;
-    background: linear-gradient(90deg, var(--bg-surface), var(--bg-surface-2));
-    box-shadow: 0 -2px 4px rgba(255, 255, 255, 0.08);
+    background: rgba(23, 25, 34, 0.94);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
     color: #fff;
 }
 
@@ -556,9 +178,17 @@ body {
     display: flex;
     justify-content: center;
     width: 100%;
-    margin: 0;
-    padding: 0;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
     list-style: none;
+    box-sizing: border-box;
+}
+
+@media (min-width: 720px) {
+    .mainNav ul {
+        max-width: 1100px;
+    }
 }
 
 .mainNav ul li {
@@ -574,53 +204,720 @@ body {
     justify-content: center;
     gap: 4px;
     width: 100%;
-    padding: 10px 0;
+    min-height: 48px;
+    padding: 6px 0;
     color: var(--text-muted);
     text-decoration: none;
-    font-weight: 500;
-    font-size: 12px;
+    font-weight: 600;
+    font-size: 10px;
     cursor: pointer;
-    transition: all 0.25s ease-in-out;
+    position: relative;
+    transition: color 0.2s ease-in-out;
 }
 
 .navItem svg {
-    font-size: 16px;
+    font-size: 18px;
 }
 
 .navItem p {
     margin: 0;
-    transition: all 0.25s ease-in-out;
 }
 
-.navItem:hover {
-    background-color: var(--bg-surface-2);
-    color: var(--accent-light);
-}
-
-.navItem:hover p {
-    transform: scale(1.1);
+.navIndicator {
+    position: absolute;
+    top: 0;
+    width: 22px;
+    height: 3px;
+    border-radius: 2px;
+    background: linear-gradient(135deg, var(--accent-light), var(--accent-hover));
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
 }
 
 .navActive {
     color: var(--accent-light);
 }
 
-.navSoon {
+.navActive .navIndicator {
+    opacity: 1;
+}
+
+
+/* ==========================================================================
+   5. DASHBOARD — scoped design tokens
+   ========================================================================== */
+.dashboardRoot {
+    --db-bg-page: var(--bg-deep);
+    --db-bg-card: var(--bg-surface);
+    --db-bg-card-2: var(--bg-surface-2);
+    --db-bg-inset: var(--bg-surface-2);
+    --db-border-subtle: rgba(255,255,255,0.08);
+    --db-border-strong: var(--border);
+    --db-text-primary: var(--text-main);
+    --db-text-secondary: var(--text-muted);
+    --db-text-tertiary: #7c8aa0;
+    --db-blue-300: #8fb4fd;
+    --db-blue-400: var(--accent-light);
+    --db-blue-500: var(--accent);
+    --db-blue-600: var(--accent-hover);
+    --db-blue-glow: rgba(59,130,246,0.35);
+    --db-purple-300: #e0c1ff;
+    --db-purple-400: var(--accent-2-light);
+    --db-purple-500: var(--accent-2);
+    --db-purple-600: var(--accent-2-hover);
+    --db-amber-400: #fcd34d;
+    --db-amber-500: var(--warning);
+    --db-grad-blue: linear-gradient(135deg, var(--db-blue-400), var(--db-blue-600));
+    --db-grad-purple: linear-gradient(135deg, var(--db-purple-400), var(--db-purple-600));
+    --db-grad-amber: linear-gradient(135deg, var(--db-amber-400), var(--db-amber-500));
+    --db-grad-blue-purple: linear-gradient(180deg, var(--db-purple-400), var(--db-blue-500));
+    --dbBgCard2: var(--db-bg-inset);
+
+    background: var(--db-bg-page);
+    position: relative;
+}
+
+.ambientGlow {
+    position: absolute;
+    top: -120px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 420px;
+    height: 420px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(59,130,246,0.10), transparent 70%);
+    pointer-events: none;
+}
+
+/* Header */
+.header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding-top: 6px;
+}
+
+.greeting {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-size: 21px;
+    font-weight: 600;
+    color: var(--db-text-primary);
+    letter-spacing: -0.01em;
+    margin: 0;
+}
+
+.dateText {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: var(--db-text-secondary);
+}
+
+.avatarBtn {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    border: 1px solid var(--db-border-subtle);
+    background: var(--db-bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.avatarCircle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--db-grad-blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    color: #fff;
+    font-size: 12px;
+}
+
+.profileMenuWrap {
+    position: relative;
+}
+
+.profileMenu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    min-width: 160px;
+    background: var(--db-bg-card);
+    border: 1px solid var(--db-border-subtle);
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    z-index: 10;
+}
+
+.profileMenu button {
+    padding: 12px 16px;
+    background: none;
+    border: none;
+    color: var(--db-text-primary);
+    font-size: 14px;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s ease-in-out;
+}
+
+.profileMenu button:hover {
+    background: var(--db-bg-inset);
+    color: var(--db-blue-300);
+}
+
+.profileMenu button + button {
+    border-top: 1px solid var(--db-border-subtle);
+}
+
+/* Today's Workout hero */
+.heroCard {
+    display: flex;
+    flex-direction: column;
+    padding: 18px;
+    border-radius: 20px;
+    background: linear-gradient(160deg, var(--db-bg-card-2), var(--db-bg-card));
+    border: 1px solid var(--db-border-subtle);
+    box-shadow: 0 8px 22px rgba(0,0,0,0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+.heroGlow {
+    position: absolute;
+    top: -36px;
+    right: -36px;
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    background: var(--db-blue-glow);
+    filter: blur(34px);
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.heroTopRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+}
+
+.heroLabelGroup {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.heroLabel {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--db-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+}
+
+.heroBadge {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--db-blue-400);
+    background: rgba(59,130,246,0.12);
+    border: 1px solid rgba(59,130,246,0.3);
+    padding: 3px 10px;
+    border-radius: 999px;
+}
+
+.heroExerciseRow {
+    margin-top: 12px;
+    padding: 12px 14px;
+    border-radius: 13px;
+    background: var(--db-bg-inset);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.exerciseName {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--db-text-primary);
+}
+
+.exerciseMeta {
+    font-size: 12.5px;
+    color: var(--db-text-secondary);
+}
+
+.heroEmpty {
+    margin-top: 14px;
+    padding: 24px 16px;
+    border-radius: 13px;
+    border: 1.5px dashed var(--db-border-strong);
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 10px;
+    text-align: center;
+}
+
+.heroEmptyIcon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--db-bg-inset);
+    display: flex;
+    align-items: center;
     justify-content: center;
-    gap: 4px;
-    padding: 10px 0;
-    color: #5c5c5c;
-    font-size: 12px;
+}
+
+.heroCta {
+    margin-top: 12px;
+    width: 100%;
+    height: 46px;
+    border: none;
+    border-radius: 13px;
+    background: var(--db-grad-blue);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px var(--db-blue-glow);
+    transition: transform 0.15s ease-in-out;
+}
+
+.heroCta:active {
+    transform: translateY(1px);
+}
+
+/* Weekly Activity */
+.weeklyCard {
+    padding: 16px;
+    border-radius: 20px;
+    background: var(--db-bg-card);
+    border: 1px solid var(--db-border-subtle);
+    box-shadow: 0 8px 22px rgba(0,0,0,0.35);
+}
+
+.weeklyTopRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.weeklyTitle {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--db-text-primary);
+}
+
+.streakBadge {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #1a1206;
+    background: var(--db-grad-amber);
+    padding: 4px 10px;
+    border-radius: 999px;
+}
+
+.streakBadgeMuted {
+    color: var(--db-text-tertiary);
+    background: var(--db-bg-inset);
+}
+
+.dayRow {
+    display: flex;
+    gap: 7px;
+    margin-top: 14px;
+}
+
+.dayCol {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
 }
 
-.navSoon svg {
+.dayTrack {
+    position: relative;
+    width: 100%;
+    height: 50px;
+    border-radius: 10px;
+    background: var(--db-bg-inset);
+    overflow: hidden;
+}
+
+.dayTrackMissed {
+    border: 1px dashed var(--db-border-strong);
+}
+
+.dayTrackFuture {
+    background: transparent;
+    border: 1px solid var(--db-border-subtle);
+    opacity: 0.6;
+}
+
+.dayTrackToday {
+    box-shadow: 0 0 0 2px var(--db-blue-400);
+}
+
+.dayFill {
+    position: absolute;
+    inset: 0;
+    background: var(--db-grad-blue-purple);
+}
+
+.dayMarker {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1.5px solid var(--db-text-tertiary);
+}
+
+.dayMarkerToday {
+    border-color: var(--db-blue-400);
+}
+
+.dayMarkerEmpty {
+    width: 14px;
+    height: 14px;
+}
+
+.dayLabel {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--db-text-tertiary);
+}
+
+.dayLabelDone {
+    color: var(--db-text-primary);
+}
+
+.dayLabelToday {
+    color: var(--db-blue-400);
+}
+
+.dayLabelFuture {
+    opacity: 0.6;
+}
+
+/* Tip banner */
+.tipBanner {
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: linear-gradient(160deg, rgba(168,85,247,0.14), var(--db-bg-card));
+    border: 1px solid rgba(168,85,247,0.2);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.tipIcon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(168,85,247,0.16);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.tipContent {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.tipEyebrow {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--db-purple-300);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.tipText {
+    font-size: 12.5px;
+    color: var(--db-text-secondary);
+    line-height: 1.35;
+}
+
+/* Stats row */
+.statsRow {
+    display: flex;
+    gap: 10px;
+}
+
+.statCard {
+    flex: 1;
+    padding: 14px 12px;
+    border-radius: 16px;
+    background: var(--db-bg-card);
+    border: 1px solid var(--db-border-subtle);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.statCardHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.statCardLabel {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--db-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.statValue {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 23px;
+    font-weight: 700;
+    background: var(--db-grad-blue);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.statUnit {
+    font-size: 11.5px;
+    color: var(--db-text-secondary);
+}
+
+.streakStatCard {
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.ringWrap {
+    position: relative;
+    width: 40px;
+    height: 40px;
+}
+
+.streakRingValue {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 16px;
+    font-weight: 700;
+    color: var(--db-text-primary);
 }
 
-.navSoon p {
-    margin: 0;
+.macroCard {
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(160deg, rgba(168,85,247,0.14), var(--db-bg-card));
+    border-color: rgba(168,85,247,0.22);
+}
+
+.macroTag {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--db-purple-300);
+    background: rgba(168,85,247,0.16);
+    padding: 3px 8px;
+    border-radius: 999px;
+    letter-spacing: 0.03em;
+}
+
+.macroLabel {
+    font-size: 11px;
+    color: var(--db-text-secondary);
+    text-align: center;
+    line-height: 1.25;
+}
+
+/* Recent Activity */
+.activityCard {
+    padding: 16px;
+    border-radius: 20px;
+    background: var(--db-bg-card);
+    border: 1px solid var(--db-border-subtle);
+    box-shadow: 0 8px 22px rgba(0,0,0,0.35);
+}
+
+.activityHeader {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.activityTitle {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--db-text-primary);
+}
+
+.activityList {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.activityRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: 13px;
+    background: var(--db-bg-inset);
+}
+
+.activityAccent {
+    width: 4px;
+    align-self: stretch;
+    border-radius: 2px;
+    background: var(--db-grad-blue);
+}
+
+.activityAccentPurple {
+    background: var(--db-grad-purple);
+}
+
+.activityInfo {
+    flex: 1;
+    min-width: 0;
+}
+
+.activityDate {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--db-text-primary);
+}
+
+.activitySummary {
+    font-size: 12px;
+    color: var(--db-text-secondary);
+    margin-top: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.activityDuration {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--db-blue-400);
+    background: rgba(59,130,246,0.12);
+    padding: 4px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.activityDurationPurple {
+    color: var(--db-purple-400);
+    background: rgba(168,85,247,0.12);
+}
+
+.deleteActivityBtn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: none;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--db-text-tertiary);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.deleteActivityBtn:hover {
+    color: #ff6b6b;
+    background: rgba(255, 44, 44, 0.12);
+}
+
+.emptyActivity {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 10px 8px;
+    text-align: center;
+}
+
+.emptyActivityIcon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--db-bg-inset);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dashboardRoot .emptyText {
+    color: var(--db-text-secondary);
+    line-height: 1.45;
+    max-width: 220px;
+}
+
+/* Dashboard-specific skeleton sizing */
+.skeletonGreeting {
+    width: 150px;
+    height: 20px;
+}
+
+.skeletonDate {
+    width: 100px;
+    height: 13px;
+    margin-top: 6px;
+}
+
+.skeletonAvatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+}
+
+.skeletonHeroLine {
+    height: 40px;
+    width: 100%;
+    border-radius: 13px;
+}
+
+.skeletonDay {
+    width: 100%;
+    height: 50px;
+    border-radius: 10px;
+}
+
+.skeletonStatCard {
+    flex: 1;
+    height: 92px;
+    border-radius: 16px;
+}
+
+.skeletonActivityRow {
+    height: 50px;
+    width: 100%;
+    border-radius: 13px;
 }
