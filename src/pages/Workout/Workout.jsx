@@ -171,9 +171,12 @@ function Workout() {
 
                 <div className={styles.exerciseList}>
                     {exercises.map((ex) => (
-                        <div className={`${styles.card} ${styles.cardBlue}`} key={ex.id}>
+                        <div className={styles.card} key={ex.id}>
                             <div className={styles.exerciseHeader}>
-                                <h3><FontAwesomeIcon icon={faDumbbell} className={styles.headerIcon} /> {ex.name}</h3>
+                                <h3>
+                                    <span className={styles.headerIconBadge}><FontAwesomeIcon icon={faDumbbell} /></span>
+                                    {ex.name}
+                                </h3>
                                 <button className={styles.iconBtn} onClick={() => removeExercise(ex.id)}>
                                     <FontAwesomeIcon icon={faTrash} />
                                 </button>
@@ -242,12 +245,15 @@ function Workout() {
 
                     {!exercises.length && (
                         <div className={`${styles.card} ${styles.emptyState}`}>
+                            <div className={styles.emptyStateIcon}>
+                                <FontAwesomeIcon icon={faDumbbell} />
+                            </div>
                             <p>No exercises yet. Add your first one below to get started.</p>
                         </div>
                     )}
                 </div>
 
-                <div className={`${styles.card} ${styles.cardPurple} ${styles.addExerciseCard}`}>
+                <div className={`${styles.card} ${styles.addExerciseCard}`}>
                     <div className={styles.exerciseSearchWrap}>
                         <input
                             type="text"

@@ -31,6 +31,7 @@ Auth, the Dashboard home screen, and workout logging are all functional end-to-e
 - Elapsed workout timer and a live sets-completed counter.
 - "Add Exercise" is a live-search autocomplete backed by `src/services/exerciseApi.js`, which fetches wger.de's public exercise database (~860 exercises, free, no API key, CORS-open) once per session and caches it. Falls back to free-text entry if the API is slow/unavailable.
 - Saves sets, notes, category, and equipment to Firestore; navigates back to `/dashboard` on save.
+- Visually redesigned to match the Dashboard's language: rounded cards (20px), no more flat left-color-bar accents (replaced with small icon badges on exercise headers), gradient CTAs, larger tap targets on the set check/remove buttons, and the same responsive max-width cap (480px mobile / 700px above 720px) so it doesn't stretch edge-to-edge on desktop. Only this file's own CSS module was touched — nothing else imports it, so no shared-class constraints like Dashboard had. The "Push Day" title is still hardcoded regardless of what's actually logged — a pre-existing quirk, untouched by this pass.
 
 **Security pass**
 - Reviewed live Firestore rules — confirmed they correctly scope all reads/writes to `request.auth.uid == userId` under `users/{uid}/**`, nothing was left open.
