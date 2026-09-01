@@ -1,0 +1,165 @@
+:root {
+    --modal-bg-surface: #1e1e1e;
+    --modal-bg-surface-2: #262626;
+    --modal-text-main: #ffffff;
+    --modal-text-muted: #a0aec0;
+    --modal-accent: #3b82f6;
+    --modal-accent-light: #60a5fa;
+    --modal-accent-hover: #2563eb;
+    --modal-accent-bg: rgba(59, 130, 246, 0.12);
+    --modal-danger: #ff5c5c;
+    --modal-danger-bg: rgba(255, 92, 92, 0.14);
+    --modal-border-subtle: rgba(255, 255, 255, 0.08);
+    --modal-grad-blue: linear-gradient(135deg, #60a5fa, #2563eb);
+}
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 1000;
+    animation: modalFadeIn 0.15s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modalCard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 340px;
+    padding: 24px 22px 20px;
+    background: var(--modal-bg-surface);
+    border: 1px solid var(--modal-border-subtle);
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    box-sizing: border-box;
+    animation: modalPopIn 0.18s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+@keyframes modalPopIn {
+    from { opacity: 0; transform: translateY(8px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.iconBadge {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--modal-accent-bg);
+    color: var(--modal-accent-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.iconBadgeDanger {
+    background: var(--modal-danger-bg);
+    color: var(--modal-danger);
+}
+
+.message {
+    margin: 0;
+    text-align: center;
+    color: var(--modal-text-main);
+    font-size: 14.5px;
+    line-height: 1.5;
+}
+
+.promptInput {
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--modal-bg-surface-2);
+    border: 1px solid var(--modal-border-subtle);
+    border-radius: 12px;
+    padding: 11px 14px;
+    color: var(--modal-text-main);
+    font-size: 14px;
+    font-family: inherit;
+    text-align: center;
+    transition: border-color 0.2s ease-in-out;
+}
+
+.promptInput:hover {
+    border-color: var(--modal-text-muted);
+}
+
+.promptInput:focus {
+    outline: none;
+    border-color: var(--modal-accent);
+}
+
+.promptInput::placeholder {
+    color: var(--modal-text-muted);
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    margin-top: 4px;
+}
+
+.cancelBtn {
+    flex: 1;
+    padding: 12px;
+    outline: none;
+    border: 1.5px solid var(--modal-border-subtle);
+    border-radius: 13px;
+    background: transparent;
+    color: var(--modal-text-muted);
+    font-weight: 600;
+    font-size: 13.5px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.cancelBtn:hover {
+    border-color: var(--modal-text-muted);
+    color: var(--modal-text-main);
+}
+
+.confirmBtn {
+    flex: 1;
+    padding: 12px;
+    outline: none;
+    border: none;
+    border-radius: 13px;
+    background: var(--modal-grad-blue);
+    color: #fff;
+    font-weight: 700;
+    font-size: 13.5px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3);
+}
+
+.confirmBtn:hover {
+    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    transform: translateY(-1px);
+}
+
+.confirmBtnDanger {
+    background: linear-gradient(135deg, #ff6b6b, #e03131);
+    box-shadow: 0 6px 16px rgba(255, 92, 92, 0.3);
+}
+
+.confirmBtnDanger:hover {
+    background: linear-gradient(135deg, #ff8787, #ff5c5c);
+}

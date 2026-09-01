@@ -6,6 +6,7 @@ import { doc, getDoc } from "firebase/firestore";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import AppSkeleton from "./components/AppSkeleton";
+import ModalProvider from "./components/ModalProvider";
 import { faUtensils, faChartLine } from '@fortawesome/free-solid-svg-icons';
 
 const Login = lazy(() => import("./pages/Login/Login"));
@@ -39,7 +40,7 @@ function App() {
         return () => unsubscribe();
     }, []);
 
-    if (loading) return <AppSkeleton />;
+    if (loading) return <ModalProvider><AppSkeleton /></ModalProvider>;
 
     const rootElement = () => {
         if (!user) return <Login />;
@@ -49,6 +50,7 @@ function App() {
     };
 
     return (
+        <ModalProvider>
         <Router>
         <Suspense fallback={<AppSkeleton />}>
         <Routes>
@@ -72,6 +74,7 @@ function App() {
         </Routes>
         </Suspense>
         </Router>
+        </ModalProvider>
     );
 }
 

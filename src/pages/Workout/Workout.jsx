@@ -8,6 +8,7 @@ import Navbar from "../../components/Navbar";
 import { fetchExerciseLibrary } from "../../services/exerciseApi";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faTrash, faCheck, faDumbbell, faClock, faFloppyDisk, faClipboardList, faBookmark, faPlay } from '@fortawesome/free-solid-svg-icons';
+import { useModal } from "../../hooks/useModal";
 
 let idCounter = 0;
 const nextId = () => `id-${Date.now()}-${idCounter++}`;
@@ -66,6 +67,7 @@ const TODAY_STR = toDateInputValue(new Date());
 
 function Workout() {
     const navigate = useNavigate();
+    const modal = useModal();
     const { workoutId } = useParams();
     const isEditing = !!workoutId;
     const [loadingWorkout, setLoadingWorkout] = useState(isEditing);
@@ -123,7 +125,7 @@ function Workout() {
             try {
                 const snap = await getDoc(doc(db, "users", user.uid, "workouts", workoutId));
                 if (!snap.exists()) {
-                    alert("Workout not found");
+                    await modal.alert("Workout not found");
                     navigate("/dashboard");
                     return;
                 }
@@ -133,14 +135,14 @@ function Workout() {
                 setOriginalDuration(data.durationSeconds || 0);
                 setExercises((data.exercises || []).map(hydrateExercise));
             } catch (error) {
-                alert(error.message);
+                await modal.alert(error.message);
                 navigate("/dashboard");
             } finally {
                 setLoadingWorkout(false);
             }
         };
         loadWorkout();
-    }, [workoutId, isEditing, navigate]);
+    }, [workoutId, isEditing, navigate, modal]);
 
     const suggestions = newExerciseName.trim()
         ? exerciseLibrary
@@ -178,7 +180,7 @@ function Workout() {
         const user = auth.currentUser;
         if (!user || !exercises.length) return;
 
-        const name = window.prompt("Name this routine (e.g. Push Day)");
+        const name = await modal.prompt("Name this routine", { placeholder: "e.g. Push Day" });
         if (!name || !name.trim()) return;
 
         try {
@@ -189,9 +191,9 @@ function Workout() {
             };
             const docRef = await addDoc(collection(db, "users", user.uid, "templates"), routineData);
             setRoutines([...routines, { id: docRef.id, ...routineData }]);
-            alert("Routine saved!");
+            await modal.alert("Routine saved!");
         } catch (error) {
-            alert(error.message);
+            await modal.alert(error.message);
         }
     };
 
@@ -233,9 +235,9 @@ function Workout() {
         0
     );
 
-    const startWorkout = () => {
+    const startWorkout = async () => {
         if (!exercises.length) {
-            alert("Add at least one exercise before starting your workout");
+            await modal.alert("Add at least one exercise before starting your workout");
             return;
         }
         setStarted(true);
@@ -244,15 +246,15 @@ function Workout() {
     const saveWorkout = async () => {
         const user = auth.currentUser;
         if (!user) {
-            alert("No user logged in");
+            await modal.alert("No user logged in");
             return;
         }
         if (!exercises.length) {
-            alert("Add at least one exercise before saving");
+            await modal.alert("Add at least one exercise before saving");
             return;
         }
         if (!isEditing && isToday && started && completedSets === 0) {
-            alert("Check off at least one set before ending your workout");
+            await modal.alert("Check off at least one set before ending your workout");
             return;
         }
 
@@ -275,10 +277,10 @@ function Workout() {
                 await addDoc(collection(db, "users", user.uid, "workouts"), payload);
             }
 
-            alert(isEditing ? "Workout updated!" : "Workout saved!");
+            await modal.alert(isEditing ? "Workout updated!" : "Workout saved!");
             navigate("/dashboard");
         } catch (error) {
-            alert(error.message);
+            await modal.alert(error.message);
         }
     };
 
@@ -286,7 +288,7 @@ function Workout() {
         try {
             await signOut(auth);
         } catch (error) {
-            alert(error.message);
+            await modal.alert(error.message);
         }
     };
 

@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../../firebase/firebase";
 import { doc, setDoc, getDoc } from "firebase/firestore";
-import { signOut } from "firebase/auth";
-import styles from "./Profile.module.css"; 
+import styles from "./Profile.module.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHouse } from '@fortawesome/free-solid-svg-icons'
+import { useModal } from "../../hooks/useModal";
 
 const LBS_PER_KG = 2.20462;
 const CM_PER_IN = 2.54;
@@ -53,6 +53,7 @@ function Profile({isOnboarding = false}) {
 
     const [isEditing, setIsEditing] = useState(isOnboarding);
     const navigate = useNavigate();
+    const modal = useModal();
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -130,7 +131,7 @@ function Profile({isOnboarding = false}) {
                     setIsEditing(false);
                 }
             } catch (error) {
-                alert(error.message);
+                await modal.alert(error.message);
             }
         };
 
@@ -140,17 +141,9 @@ function Profile({isOnboarding = false}) {
                 navigate("/dashboard")
             }
         } catch (error) {
-            alert(error.message);
+            await modal.alert(error.message);
         }
     }
-
-    const handleLogout = async () => {
-        try {
-            await signOut(auth);
-        } catch (error) {
-            alert(error.message);
-        }
-    };
 
   return (
     <div className={styles.background}>

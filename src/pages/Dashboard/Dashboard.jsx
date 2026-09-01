@@ -7,6 +7,7 @@ import { signOut } from "firebase/auth";
 import { collection, doc, deleteDoc, getDoc, query, where, orderBy, getDocs, Timestamp } from "firebase/firestore";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDumbbell, faFire, faLightbulb, faChevronRight, faListCheck, faTrash, faPen, faPlus, faUser, faClipboardList } from '@fortawesome/free-solid-svg-icons';
+import { useModal } from "../../hooks/useModal";
 
 const DAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
 
@@ -59,6 +60,7 @@ function formatLongDate(date) {
 
 function Dashboard() {
     const navigate = useNavigate();
+    const modal = useModal();
     const [workouts, setWorkouts] = useState([]);
     const [firstName, setFirstName] = useState("");
     const [routineCount, setRoutineCount] = useState(0);
@@ -69,17 +71,18 @@ function Dashboard() {
         try {
             await signOut(auth);
         } catch (error) {
-            alert(error.message);
+            await modal.alert(error.message);
         }
     };
 
     const handleDeleteWorkout = async (workoutId) => {
-        if (!window.confirm("Delete this workout? This can't be undone.")) return;
+        const confirmed = await modal.confirm("Delete this workout? This can't be undone.", { danger: true });
+        if (!confirmed) return;
         try {
             await deleteDoc(doc(db, "users", auth.currentUser.uid, "workouts", workoutId));
             setWorkouts((prev) => prev.filter((w) => w.id !== workoutId));
         } catch (error) {
-            alert(error.message);
+            await modal.alert(error.message);
         }
     };
 

@@ -6,6 +6,7 @@ import Navbar from "../../components/Navbar";
 import { fetchExerciseLibrary } from "../../services/exerciseApi";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faTrash, faPen, faClipboardList, faXmark, faFloppyDisk } from '@fortawesome/free-solid-svg-icons';
+import { useModal } from "../../hooks/useModal";
 
 let idCounter = 0;
 const nextId = () => `id-${Date.now()}-${idCounter++}`;
@@ -16,6 +17,7 @@ const nextId = () => `id-${Date.now()}-${idCounter++}`;
 const ROUTINES_COLLECTION = "templates";
 
 function Routines() {
+    const modal = useModal();
     const [routines, setRoutines] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -114,11 +116,11 @@ function Routines() {
         const user = auth.currentUser;
         if (!user) return;
         if (!routineName.trim()) {
-            alert("Give this routine a name");
+            await modal.alert("Give this routine a name");
             return;
         }
         if (!builderExercises.length) {
-            alert("Add at least one exercise before saving");
+            await modal.alert("Add at least one exercise before saving");
             return;
         }
 
@@ -139,17 +141,18 @@ function Routines() {
             setShowBuilder(false);
             setEditingId(null);
         } catch (error) {
-            alert(error.message);
+            await modal.alert(error.message);
         }
     };
 
     const deleteRoutine = async (id) => {
-        if (!window.confirm("Delete this routine? This can't be undone.")) return;
+        const confirmed = await modal.confirm("Delete this routine? This can't be undone.", { danger: true });
+        if (!confirmed) return;
         try {
             await deleteDoc(doc(db, "users", auth.currentUser.uid, ROUTINES_COLLECTION, id));
             setRoutines((prev) => prev.filter((r) => r.id !== id));
         } catch (error) {
-            alert(error.message);
+            await modal.alert(error.message);
         }
     };
 
