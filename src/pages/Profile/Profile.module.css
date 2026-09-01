@@ -199,13 +199,20 @@
 
 .heightImperial {
     display: flex;
-    gap: 10px;
+    gap: 6px;
     min-width: 0;
 }
 
 .heightImperial .inputWithUnit {
     flex: 1;
     min-width: 0;
+    gap: 4px;
+}
+
+.heightImperial .inputWithUnit input {
+    padding: 10px 6px;
+    min-width: 24px;
+    text-align: center;
 }
 
 .inputWithUnit {
