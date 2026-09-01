@@ -543,7 +543,7 @@ body {
 
 .dayRowWrap {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 6px;
     margin-top: 14px;
 }
@@ -551,6 +551,7 @@ body {
 .weekNavBtn {
     width: 24px;
     height: 24px;
+    margin-top: 13px;
     flex-shrink: 0;
     border: none;
     background: var(--db-bg-inset);
