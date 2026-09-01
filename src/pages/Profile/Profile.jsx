@@ -4,7 +4,7 @@ import { auth, db } from "../../firebase/firebase";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import styles from "./Profile.module.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faHouse } from '@fortawesome/free-solid-svg-icons'
+import { faHouse, faPen, faXmark } from '@fortawesome/free-solid-svg-icons'
 import { useModal } from "../../hooks/useModal";
 
 const LBS_PER_KG = 2.20462;
@@ -148,17 +148,19 @@ function Profile({isOnboarding = false}) {
   return (
     <div className={styles.background}>
         <div className={styles.profileCard}>
-            <h2>{isOnboarding ? "CreateProfile" : "Profile"}</h2>
-            {!isOnboarding && !isEditing && (
-                <button onClick={() => setIsEditing(true)} className={styles.editIcon}>
-                    Edit Profile ✎
-                </button>
-            )}
-            {!isOnboarding && isEditing && (
-                <button onClick={() => setIsEditing(false)} className={styles.exitIcon}>
-                    X
-                </button>
-            )}
+            <div className={styles.header}>
+                <h2>{isOnboarding ? "CreateProfile" : "Profile"}</h2>
+                {!isOnboarding && !isEditing && (
+                    <button onClick={() => setIsEditing(true)} className={styles.editIcon}>
+                        Edit Profile <FontAwesomeIcon icon={faPen} />
+                    </button>
+                )}
+                {!isOnboarding && isEditing && (
+                    <button onClick={() => setIsEditing(false)} className={styles.exitIcon} aria-label="Cancel editing">
+                        <FontAwesomeIcon icon={faXmark} />
+                    </button>
+                )}
+            </div>
             <div className={styles.contentContainer}>
                 <div className={styles.stats}>
                     <input 
@@ -280,7 +282,7 @@ function Profile({isOnboarding = false}) {
                     </div>
                     <div className={styles.inputGroup}>
                         <label>Activity Level</label>
-                        <select className={styles.dropdown} id="activityLevel" value={activityLevel} disabled={!isEditing} onChange={(e) => setActivityLevel(e.target.value)} className={styles.dropdown}>
+                        <select className={styles.dropdown} id="activityLevel" value={activityLevel} disabled={!isEditing} onChange={(e) => setActivityLevel(e.target.value)}>
                             <option value="Sedentary">Sedentary (Little to no exercise)</option>
                             <option value="Light">Light (Light exercise 1-3x per week or a Job where you spend time on your feet)</option>
                             <option value="Moderate">Moderate (Moderate exercise 3-5x per week)</option>
