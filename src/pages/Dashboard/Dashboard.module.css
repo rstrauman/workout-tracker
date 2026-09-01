@@ -541,10 +541,44 @@ body {
     background: var(--db-bg-inset);
 }
 
+.dayRowWrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+}
+
+.weekNavBtn {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    border: none;
+    background: var(--db-bg-inset);
+    color: var(--db-text-tertiary);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+}
+
+.weekNavBtn:hover:not(:disabled) {
+    color: var(--db-blue-400);
+    background: var(--db-blue-glow);
+}
+
+.weekNavBtn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
 .dayRow {
     display: flex;
     gap: 7px;
-    margin-top: 14px;
+    flex: 1;
+    min-width: 0;
 }
 
 .dayCol {
@@ -553,6 +587,16 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 6px;
+}
+
+.dayColClickable {
+    cursor: pointer;
+    border-radius: 10px;
+    transition: transform 0.15s ease-in-out;
+}
+
+.dayColClickable:hover {
+    transform: translateY(-2px);
 }
 
 .dayTrack {

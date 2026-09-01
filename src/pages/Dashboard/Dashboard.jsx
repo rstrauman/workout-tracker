@@ -6,7 +6,7 @@ import { auth, db } from "../../firebase/firebase";
 import { signOut } from "firebase/auth";
 import { collection, doc, deleteDoc, getDoc, query, where, orderBy, getDocs, Timestamp } from "firebase/firestore";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDumbbell, faFire, faLightbulb, faChevronRight, faListCheck, faTrash, faPen, faPlus, faUser, faClipboardList } from '@fortawesome/free-solid-svg-icons';
+import { faDumbbell, faFire, faLightbulb, faChevronRight, faChevronLeft, faListCheck, faTrash, faPen, faPlus, faUser, faClipboardList } from '@fortawesome/free-solid-svg-icons';
 import { useModal } from "../../hooks/useModal";
 
 const DAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
@@ -32,6 +32,20 @@ function startOfWeekFor(date) {
     const d = startOfDay(date);
     d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
     return d;
+}
+
+function toDateStr(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+}
+
+function formatWeekRangeLabel(start) {
+    const end = new Date(start);
+    end.setDate(end.getDate() + 6);
+    const opts = { month: 'short', day: 'numeric' };
+    return `${start.toLocaleDateString(undefined, opts)} – ${end.toLocaleDateString(undefined, opts)}`;
 }
 
 function formatDuration(totalSeconds) {
@@ -66,6 +80,7 @@ function Dashboard() {
     const [routineCount, setRoutineCount] = useState(0);
     const [loading, setLoading] = useState(true);
     const [menuOpen, setMenuOpen] = useState(false);
+    const [weekOffset, setWeekOffset] = useState(0);
 
     const handleLogout = async () => {
         try {
@@ -138,18 +153,37 @@ function Dashboard() {
 
     const startOfWeek = startOfWeekFor(today);
 
+    const viewedWeekStart = new Date(startOfWeek);
+    viewedWeekStart.setDate(viewedWeekStart.getDate() + weekOffset * 7);
+
+    const thirtyDaysAgo = new Date(todayStart);
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const earliestFetchedWeekStart = startOfWeekFor(thirtyDaysAgo);
+    const canGoToPrevWeek = viewedWeekStart > earliestFetchedWeekStart;
+    const canGoToNextWeek = weekOffset < 0;
+
     const weekDays = Array.from({ length: 7 }, (_, i) => {
-        const d = new Date(startOfWeek);
-        d.setDate(startOfWeek.getDate() + i);
+        const d = new Date(viewedWeekStart);
+        d.setDate(viewedWeekStart.getDate() + i);
+        const dayWorkout = workouts.find((w) => isSameDay(w.date, d));
         return {
+            date: d,
             label: DAY_LABELS[i],
-            done: workouts.some((w) => isSameDay(w.date, d)),
+            done: !!dayWorkout,
+            workoutId: dayWorkout?.id,
             isToday: isSameDay(d, todayStart),
             isFuture: d > todayStart,
         };
     });
 
-    const completedThisWeek = weekDays.filter((d) => d.done).length;
+    const handleDayClick = (day) => {
+        if (day.isFuture) return;
+        navigate(day.workoutId ? `/workout/${day.workoutId}` : `/workout?date=${toDateStr(day.date)}`);
+    };
+
+    // "This Week" in the stats row always reflects the real current week, independent
+    // of whatever week the day-strip above is paged to.
+    const completedThisWeek = workouts.filter((w) => w.date >= startOfWeek && w.date < new Date(startOfWeek.getTime() + 7 * 86400000)).length;
 
     let streak = 0;
     const cursor = startOfDay(today);
@@ -267,7 +301,7 @@ function Dashboard() {
                 {/* Weekly Activity */}
                 <div className={styles.weeklyCard}>
                     <div className={styles.weeklyTopRow}>
-                        <span className={styles.weeklyTitle}>This Week</span>
+                        <span className={styles.weeklyTitle}>{weekOffset === 0 ? "This Week" : formatWeekRangeLabel(viewedWeekStart)}</span>
                         {loading ? (
                             <div className={styles.skeleton} style={{ width: 90, height: 22, borderRadius: 999 }}></div>
                         ) : (
@@ -277,32 +311,54 @@ function Dashboard() {
                             </span>
                         )}
                     </div>
-                    <div className={styles.dayRow}>
-                        {loading ? (
-                            DAY_LABELS.map((label, i) => (
-                                <div className={styles.dayCol} key={i}>
-                                    <div className={`${styles.skeleton} ${styles.skeletonDay}`}></div>
-                                    <div className={styles.dayMarkerEmpty}></div>
-                                    <span className={styles.dayLabel}>{label}</span>
-                                </div>
-                            ))
-                        ) : (
-                            weekDays.map((d, i) => (
-                                <div className={styles.dayCol} key={i}>
-                                    <div className={`${styles.dayTrack} ${d.done ? "" : d.isFuture ? styles.dayTrackFuture : styles.dayTrackMissed} ${d.isToday ? styles.dayTrackToday : ""}`}>
-                                        {d.done && <div className={styles.dayFill}></div>}
-                                    </div>
-                                    {d.done ? (
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--db-blue-300)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                    ) : d.isFuture ? (
+                    <div className={styles.dayRowWrap}>
+                        <button
+                            className={styles.weekNavBtn}
+                            onClick={() => setWeekOffset((o) => o - 1)}
+                            disabled={loading || !canGoToPrevWeek}
+                            aria-label="Previous week"
+                        >
+                            <FontAwesomeIcon icon={faChevronLeft} />
+                        </button>
+                        <div className={styles.dayRow}>
+                            {loading ? (
+                                DAY_LABELS.map((label, i) => (
+                                    <div className={styles.dayCol} key={i}>
+                                        <div className={`${styles.skeleton} ${styles.skeletonDay}`}></div>
                                         <div className={styles.dayMarkerEmpty}></div>
-                                    ) : (
-                                        <div className={`${styles.dayMarker} ${d.isToday ? styles.dayMarkerToday : ""}`}></div>
-                                    )}
-                                    <span className={`${styles.dayLabel} ${d.done ? styles.dayLabelDone : ""} ${d.isToday ? styles.dayLabelToday : ""} ${d.isFuture ? styles.dayLabelFuture : ""}`}>{d.label}</span>
-                                </div>
-                            ))
-                        )}
+                                        <span className={styles.dayLabel}>{label}</span>
+                                    </div>
+                                ))
+                            ) : (
+                                weekDays.map((d, i) => (
+                                    <div
+                                        className={`${styles.dayCol} ${!d.isFuture ? styles.dayColClickable : ""}`}
+                                        key={i}
+                                        onClick={() => handleDayClick(d)}
+                                    >
+                                        <div className={`${styles.dayTrack} ${d.done ? "" : d.isFuture ? styles.dayTrackFuture : styles.dayTrackMissed} ${d.isToday ? styles.dayTrackToday : ""}`}>
+                                            {d.done && <div className={styles.dayFill}></div>}
+                                        </div>
+                                        {d.done ? (
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--db-blue-300)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                        ) : d.isFuture ? (
+                                            <div className={styles.dayMarkerEmpty}></div>
+                                        ) : (
+                                            <div className={`${styles.dayMarker} ${d.isToday ? styles.dayMarkerToday : ""}`}></div>
+                                        )}
+                                        <span className={`${styles.dayLabel} ${d.done ? styles.dayLabelDone : ""} ${d.isToday ? styles.dayLabelToday : ""} ${d.isFuture ? styles.dayLabelFuture : ""}`}>{d.label}</span>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                        <button
+                            className={styles.weekNavBtn}
+                            onClick={() => setWeekOffset((o) => o + 1)}
+                            disabled={loading || !canGoToNextWeek}
+                            aria-label="Next week"
+                        >
+                            <FontAwesomeIcon icon={faChevronRight} />
+                        </button>
                     </div>
                 </div>
 

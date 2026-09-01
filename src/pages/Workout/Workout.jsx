@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { auth, db } from "../../firebase/firebase";
 import { collection, addDoc, updateDoc, doc, getDoc, getDocs } from "firebase/firestore";
 import { signOut } from "firebase/auth";
@@ -64,11 +64,13 @@ function formatElapsed(totalSeconds) {
 }
 
 const TODAY_STR = toDateInputValue(new Date());
+const DATE_STR_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
 function Workout() {
     const navigate = useNavigate();
     const modal = useModal();
     const { workoutId } = useParams();
+    const [searchParams] = useSearchParams();
     const isEditing = !!workoutId;
     const [loadingWorkout, setLoadingWorkout] = useState(isEditing);
     const [originalDuration, setOriginalDuration] = useState(0);
@@ -79,7 +81,10 @@ function Workout() {
     const [libraryLoading, setLibraryLoading] = useState(true);
     const [libraryError, setLibraryError] = useState(false);
     const [showSuggestions, setShowSuggestions] = useState(false);
-    const [workoutDateStr, setWorkoutDateStr] = useState(TODAY_STR);
+    const [workoutDateStr, setWorkoutDateStr] = useState(() => {
+        const dateParam = searchParams.get("date");
+        return dateParam && DATE_STR_PATTERN.test(dateParam) && dateParam <= TODAY_STR ? dateParam : TODAY_STR;
+    });
     const [workoutTitle, setWorkoutTitle] = useState("Workout");
     // The Firestore collection is still named "templates" — renaming it would mean
     // migrating already-live user data for a purely cosmetic change, so only the
