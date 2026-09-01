@@ -706,27 +706,50 @@ body {
     color: var(--db-text-secondary);
 }
 
-.streakStatCard {
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
+.statCardBtn {
+    appearance: none;
+    -webkit-appearance: none;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
 }
 
-.ringWrap {
+.statCardBtn:hover {
+    border-color: var(--db-purple-500);
+    transform: translateY(-1px);
+}
+
+.routineStatCard {
     position: relative;
-    width: 40px;
-    height: 40px;
 }
 
-.streakRingValue {
+.weekStatCard {
+    position: relative;
+}
+
+.streakCornerBottom {
+    top: auto;
+    bottom: 10px;
+}
+
+.routineStatCard .statValue {
+    background: var(--db-grad-purple);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.streakCorner {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 16px;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10.5px;
     font-weight: 700;
-    color: var(--db-text-primary);
+    color: var(--db-amber-400);
 }
 
 .macroCard {

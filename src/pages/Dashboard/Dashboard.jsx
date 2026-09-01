@@ -6,12 +6,9 @@ import { auth, db } from "../../firebase/firebase";
 import { signOut } from "firebase/auth";
 import { collection, doc, deleteDoc, getDoc, query, where, orderBy, getDocs, Timestamp } from "firebase/firestore";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDumbbell, faFire, faLightbulb, faChevronRight, faListCheck, faTrash, faPlus, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faDumbbell, faFire, faLightbulb, faChevronRight, faListCheck, faTrash, faPlus, faUser, faClipboardList } from '@fortawesome/free-solid-svg-icons';
 
 const DAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
-const STREAK_RING_RADIUS = 16;
-const STREAK_RING_CIRCUMFERENCE = 2 * Math.PI * STREAK_RING_RADIUS;
-const STREAK_RING_GOAL_DAYS = 7;
 
 function getGreeting() {
     const hour = new Date().getHours();
@@ -64,6 +61,7 @@ function Dashboard() {
     const navigate = useNavigate();
     const [workouts, setWorkouts] = useState([]);
     const [firstName, setFirstName] = useState("");
+    const [routineCount, setRoutineCount] = useState(0);
     const [loading, setLoading] = useState(true);
     const [menuOpen, setMenuOpen] = useState(false);
 
@@ -97,13 +95,14 @@ function Dashboard() {
             thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
             try {
-                const [snapshot, userDoc] = await Promise.all([
+                const [snapshot, userDoc, routinesSnapshot] = await Promise.all([
                     getDocs(query(
                         collection(db, "users", user.uid, "workouts"),
                         where("date", ">=", Timestamp.fromDate(thirtyDaysAgo)),
                         orderBy("date", "desc")
                     )),
                     getDoc(doc(db, "users", user.uid)),
+                    getDocs(collection(db, "users", user.uid, "templates")),
                 ]);
 
                 const data = snapshot.docs.map((docSnap) => {
@@ -115,6 +114,7 @@ function Dashboard() {
                     };
                 });
                 setWorkouts(data);
+                setRoutineCount(routinesSnapshot.size);
 
                 if (userDoc.exists()) {
                     setFirstName(userDoc.data().firstName || "");
@@ -157,9 +157,6 @@ function Dashboard() {
         streak++;
         cursor.setDate(cursor.getDate() - 1);
     }
-
-    const streakFraction = Math.min(streak / STREAK_RING_GOAL_DAYS, 1);
-    const streakDashOffset = STREAK_RING_CIRCUMFERENCE * (1 - streakFraction);
 
     // Last 4 weeks' workout counts (oldest to newest), from data already fetched above.
     const weeklyCounts = Array.from({ length: 4 }, (_, i) => {
@@ -320,7 +317,12 @@ function Dashboard() {
 
                 {/* Stats row */}
                 <div className={styles.statsRow}>
-                    <div className={styles.statCard}>
+                    <div className={`${styles.statCard} ${styles.weekStatCard}`}>
+                        {!loading && (
+                            <span className={`${styles.streakCorner} ${styles.streakCornerBottom}`}>
+                                <FontAwesomeIcon icon={faFire} /> {streak}
+                            </span>
+                        )}
                         {loading ? (
                             <>
                                 <div className={styles.skeleton} style={{ width: 60, height: 10 }}></div>
@@ -354,29 +356,26 @@ function Dashboard() {
                         )}
                     </div>
 
-                    <div className={`${styles.statCard} ${styles.streakStatCard}`}>
+                    <button
+                        className={`${styles.statCard} ${styles.statCardBtn} ${styles.routineStatCard}`}
+                        onClick={() => navigate('/routines')}
+                    >
                         {loading ? (
-                            <div className={styles.skeleton} style={{ width: 40, height: 40, borderRadius: "50%" }}></div>
+                            <>
+                                <div className={styles.skeleton} style={{ width: 60, height: 10 }}></div>
+                                <div className={styles.skeleton} style={{ width: 30, height: 23 }}></div>
+                            </>
                         ) : (
-                            <div className={styles.ringWrap}>
-                                <svg width="40" height="40" viewBox="0 0 40 40">
-                                    <circle cx="20" cy="20" r={STREAK_RING_RADIUS} fill="none" stroke="var(--db-bg-inset)" strokeWidth="4"></circle>
-                                    <circle
-                                        cx="20" cy="20" r={STREAK_RING_RADIUS}
-                                        fill="none"
-                                        stroke="var(--db-amber-500)"
-                                        strokeWidth="4"
-                                        strokeLinecap="butt"
-                                        strokeDasharray={STREAK_RING_CIRCUMFERENCE}
-                                        strokeDashoffset={streakDashOffset}
-                                        transform="rotate(-90 20 20)"
-                                    ></circle>
-                                </svg>
-                                <div className={styles.streakRingValue}>{streak}</div>
-                            </div>
+                            <>
+                                <div className={styles.statCardHeader}>
+                                    <span className={styles.statCardLabel}>Routines</span>
+                                    <FontAwesomeIcon icon={faClipboardList} style={{ color: "var(--db-purple-400)", fontSize: 13 }} />
+                                </div>
+                                <span className={styles.statValue}>{routineCount}</span>
+                                <span className={styles.statUnit}>saved</span>
+                            </>
                         )}
-                        <span className={styles.statUnit}>day streak</span>
-                    </div>
+                    </button>
 
                     <div className={`${styles.statCard} ${styles.macroCard}`}>
                         <svg width="38" height="38" viewBox="0 0 48 48" style={{ opacity: 0.55 }}>

@@ -1,11 +1,12 @@
 import { NavLink } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHouse, faDumbbell, faUtensils, faChartLine, faGear } from '@fortawesome/free-solid-svg-icons';
+import { faHouse, faDumbbell, faClipboardList, faUtensils, faChartLine, faGear } from '@fortawesome/free-solid-svg-icons';
 import styles from "../pages/Dashboard/Dashboard.module.css";
 
 const navItems = [
     { to: "/dashboard", label: "Home", icon: faHouse },
     { to: "/workout", label: "Workout", icon: faDumbbell },
+    { to: "/routines", label: "Routines", icon: faClipboardList },
     { to: "/meals", label: "Meals", icon: faUtensils },
     { to: "/progress", label: "Progress", icon: faChartLine },
     { to: "/profile", label: "Settings", icon: faGear },

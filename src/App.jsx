@@ -13,6 +13,7 @@ const Verification = lazy(() => import("./pages/Verification/Verification"));
 const Profile = lazy(() => import("./pages/Profile/Profile"));
 const Dashboard = lazy(() => import("./pages/Dashboard/Dashboard"));
 const Workout = lazy(() => import("./pages/Workout/Workout"));
+const Routines = lazy(() => import("./pages/Routines/Routines"));
 const ComingSoon = lazy(() => import("./pages/ComingSoon/ComingSoon"));
 const NotFound = lazy(() => import("./pages/NotFound/NotFound"));
 
@@ -61,6 +62,7 @@ function App() {
             {/* <Route path="/onboarding" element={<Onboarding />} /> */}
 
             <Route path="/workout" element={<ProtectedRoute user={user}><Workout /></ProtectedRoute>} />
+            <Route path="/routines" element={<ProtectedRoute user={user}><Routines /></ProtectedRoute>} />
 
             <Route path="/meals" element={<ProtectedRoute user={user}><ComingSoon title="Meals" icon={faUtensils} description="Meal logging and macro tracking are on the way." /></ProtectedRoute>} />
             <Route path="/progress" element={<ProtectedRoute user={user}><ComingSoon title="Progress" icon={faChartLine} description="Long-term progress charts and PR tracking are on the way." /></ProtectedRoute>} />

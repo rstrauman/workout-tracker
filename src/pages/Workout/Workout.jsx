@@ -7,7 +7,7 @@ import styles from "./Workout.module.css";
 import Navbar from "../../components/Navbar";
 import { fetchExerciseLibrary } from "../../services/exerciseApi";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faTrash, faCheck, faDumbbell, faClock, faFloppyDisk, faLayerGroup, faBookmark } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faTrash, faCheck, faDumbbell, faClock, faFloppyDisk, faClipboardList, faBookmark, faPlay } from '@fortawesome/free-solid-svg-icons';
 
 let idCounter = 0;
 const nextId = () => `id-${Date.now()}-${idCounter++}`;
@@ -58,16 +58,20 @@ function Workout() {
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [workoutDateStr, setWorkoutDateStr] = useState(TODAY_STR);
     const [workoutTitle, setWorkoutTitle] = useState("Workout");
-    const [templates, setTemplates] = useState([]);
-    const [showTemplates, setShowTemplates] = useState(false);
+    // The Firestore collection is still named "templates" — renaming it would mean
+    // migrating already-live user data for a purely cosmetic change, so only the
+    // user-facing wording became "Routine".
+    const [routines, setRoutines] = useState([]);
+    const [showRoutines, setShowRoutines] = useState(false);
+    const [started, setStarted] = useState(false);
 
     const isToday = workoutDateStr === TODAY_STR;
 
     useEffect(() => {
-        if (!isToday) return;
+        if (!isToday || !started) return;
         const timer = setInterval(() => setElapsed((e) => e + 1), 1000);
         return () => clearInterval(timer);
-    }, [isToday]);
+    }, [isToday, started]);
 
     useEffect(() => {
         fetchExerciseLibrary()
@@ -77,17 +81,17 @@ function Workout() {
     }, []);
 
     useEffect(() => {
-        const fetchTemplates = async () => {
+        const fetchRoutines = async () => {
             const user = auth.currentUser;
             if (!user) return;
             try {
                 const snapshot = await getDocs(collection(db, "users", user.uid, "templates"));
-                setTemplates(snapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() })));
+                setRoutines(snapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() })));
             } catch (error) {
-                console.error("Failed to load templates:", error);
+                console.error("Failed to load routines:", error);
             }
         };
-        fetchTemplates();
+        fetchRoutines();
     }, []);
 
     const suggestions = newExerciseName.trim()
@@ -113,31 +117,31 @@ function Workout() {
         setExercises(exercises.filter((ex) => ex.id !== exerciseId));
     };
 
-    const loadTemplate = (template) => {
+    const loadRoutine = (routine) => {
         setExercises([
             ...exercises,
-            ...template.exercises.map((ex) => createExercise(ex.name, { category: ex.category, equipment: ex.equipment })),
+            ...routine.exercises.map((ex) => createExercise(ex.name, { category: ex.category, equipment: ex.equipment })),
         ]);
-        setWorkoutTitle(template.name);
-        setShowTemplates(false);
+        setWorkoutTitle(routine.name);
+        setShowRoutines(false);
     };
 
-    const saveAsTemplate = async () => {
+    const saveAsRoutine = async () => {
         const user = auth.currentUser;
         if (!user || !exercises.length) return;
 
-        const name = window.prompt("Name this template (e.g. Push Day)");
+        const name = window.prompt("Name this routine (e.g. Push Day)");
         if (!name || !name.trim()) return;
 
         try {
-            const templateData = {
+            const routineData = {
                 name: name.trim(),
                 exercises: exercises.map((ex) => ({ name: ex.name, category: ex.category, equipment: ex.equipment })),
                 createdAt: new Date(),
             };
-            const docRef = await addDoc(collection(db, "users", user.uid, "templates"), templateData);
-            setTemplates([...templates, { id: docRef.id, ...templateData }]);
-            alert("Template saved!");
+            const docRef = await addDoc(collection(db, "users", user.uid, "templates"), routineData);
+            setRoutines([...routines, { id: docRef.id, ...routineData }]);
+            alert("Routine saved!");
         } catch (error) {
             alert(error.message);
         }
@@ -181,6 +185,14 @@ function Workout() {
         0
     );
 
+    const startWorkout = () => {
+        if (!exercises.length) {
+            alert("Add at least one exercise before starting your workout");
+            return;
+        }
+        setStarted(true);
+    };
+
     const saveWorkout = async () => {
         const user = auth.currentUser;
         if (!user) {
@@ -189,6 +201,10 @@ function Workout() {
         }
         if (!exercises.length) {
             alert("Add at least one exercise before saving");
+            return;
+        }
+        if (isToday && started && completedSets === 0) {
+            alert("Check off at least one set before ending your workout");
             return;
         }
 
@@ -234,9 +250,10 @@ function Workout() {
                             className={styles.dateInput}
                             value={workoutDateStr}
                             max={TODAY_STR}
+                            disabled={started}
                             onChange={(e) => setWorkoutDateStr(e.target.value)}
                         />
-                        {isToday && (
+                        {isToday && started && (
                             <div className={styles.timer}>
                                 <FontAwesomeIcon icon={faClock} />
                                 {formatElapsed(elapsed)}
@@ -245,27 +262,27 @@ function Workout() {
                     </div>
                 </div>
 
-                {templates.length > 0 && (
-                    <div className={styles.templateWrap}>
+                {routines.length > 0 && (
+                    <div className={styles.routineWrap}>
                         <button
-                            className={styles.templateBtn}
-                            onClick={() => setShowTemplates((s) => !s)}
-                            onBlur={() => setShowTemplates(false)}
+                            className={styles.routineBtn}
+                            onClick={() => setShowRoutines((s) => !s)}
+                            onBlur={() => setShowRoutines(false)}
                         >
-                            <FontAwesomeIcon icon={faLayerGroup} /> Use Template
+                            <FontAwesomeIcon icon={faClipboardList} /> Use Routine
                         </button>
-                        {showTemplates && (
+                        {showRoutines && (
                             <div className={styles.suggestionList}>
-                                {templates.map((t) => (
+                                {routines.map((r) => (
                                     <div
                                         className={styles.suggestionItem}
-                                        key={t.id}
-                                        onMouseDown={() => loadTemplate(t)}
+                                        key={r.id}
+                                        onMouseDown={() => loadRoutine(r)}
                                     >
                                         <div className={styles.suggestionText}>
-                                            <span className={styles.suggestionName}>{t.name}</span>
+                                            <span className={styles.suggestionName}>{r.name}</span>
                                             <span className={styles.suggestionMeta}>
-                                                {t.exercises.length} exercise{t.exercises.length !== 1 ? "s" : ""}
+                                                {r.exercises.length} exercise{r.exercises.length !== 1 ? "s" : ""}
                                             </span>
                                         </div>
                                     </div>
@@ -399,14 +416,38 @@ function Workout() {
                 </div>
 
                 {exercises.length > 0 && (
-                    <button className={styles.saveTemplateBtn} onClick={saveAsTemplate}>
-                        <FontAwesomeIcon icon={faBookmark} /> Save as Template
+                    <button className={styles.saveRoutineBtn} onClick={saveAsRoutine}>
+                        <FontAwesomeIcon icon={faBookmark} /> Save as Routine
                     </button>
                 )}
 
-                <button className={styles.saveBtn} onClick={saveWorkout}>
-                    <FontAwesomeIcon icon={faFloppyDisk} /> Save Workout
-                </button>
+                {isToday && !started ? (
+                    <>
+                        <button
+                            className={styles.saveBtn}
+                            onClick={startWorkout}
+                            disabled={!exercises.length}
+                        >
+                            <FontAwesomeIcon icon={faPlay} /> Start Workout
+                        </button>
+                        {!exercises.length && (
+                            <p className={styles.saveHint}>Add at least one exercise to start your workout.</p>
+                        )}
+                    </>
+                ) : (
+                    <>
+                        <button
+                            className={styles.saveBtn}
+                            onClick={saveWorkout}
+                            disabled={isToday && completedSets === 0}
+                        >
+                            <FontAwesomeIcon icon={faFloppyDisk} /> {isToday ? "End Workout" : "Save Workout"}
+                        </button>
+                        {isToday && completedSets === 0 && (
+                            <p className={styles.saveHint}>Check off at least one set to end your workout.</p>
+                        )}
+                    </>
+                )}
 
                 <p className={styles.logoutLink} onClick={handleLogout}>Log Out</p>
             </div>
