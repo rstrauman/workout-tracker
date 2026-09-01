@@ -4,7 +4,7 @@ Working doc for picking this project back up. See `README.md` for the portfolio-
 
 ## Where we're at
 
-Auth, the Dashboard home screen, and workout logging are all functional end-to-end against real Firestore data. Live at https://workout-tracker-7dd87.web.app (Firebase Hosting) as of 2026-08-25 — unlisted URL, not shared anywhere. No automated tests exist. Tech stack: React 19 + Vite 8, Firebase 12 (Auth + Firestore), react-router-dom 7.18.2, FontAwesome icons, wger.de's free public exercise API.
+Auth, the Dashboard home screen, workout logging (including editing past workouts), and a dedicated Routines builder are all functional end-to-end against real Firestore data. Live at https://workout-tracker-7dd87.web.app (Firebase Hosting) as of 2026-09-01 — unlisted URL, not shared anywhere. No automated tests exist. Tech stack: React 19 + Vite 8, Firebase 12 (Auth + Firestore), react-router-dom 7.18.2, FontAwesome icons, wger.de's free public exercise API.
 
 ## What's been done
 
@@ -16,7 +16,7 @@ Auth, the Dashboard home screen, and workout logging are all functional end-to-e
 **Dashboard (`/dashboard`)**
 - Real data from `users/{uid}/workouts`: today's workout (or an empty-state CTA), a day-streak counter, and a Recent Activity list of the last 3 workouts (deletable).
 - Navbar wired to real routes with active-state highlighting, including Meals/Progress (see "Pages & polish" below).
-- The header avatar is a dropdown (Edit Profile / Log Out) instead of a direct link to `/profile` — built to be extensible as more account-level actions come up. Note: `Profile.jsx` still has its own separate, still-unused `handleLogout` (the source of a lingering unused-var lint warning) — this new one lives in `Dashboard.jsx` instead; worth wiring up or removing the `Profile.jsx` one at some point.
+- The header avatar is a dropdown (Edit Profile / Log Out) instead of a direct link to `/profile` — built to be extensible as more account-level actions come up. (`Profile.jsx` had its own separate, unused `handleLogout` at the time — since removed, see "Replaced native alert/confirm/prompt..." below.)
 
 **Dashboard visual redesign**
 - Went through a full visual redesign of the Dashboard, done via a Claude Design canvas mockup first (mobile-first, ~844px viewport, no-scroll) before touching real code — see below for that process. The live implementation reuses the app's *existing* color tokens (`--bg-deep`/`--bg-surface`/`--bg-surface-2`, `--accent`/`--accent-2`/`--warning`) rather than introducing a new palette; only the components got richer (real charts instead of flat colored boxes), not the underlying color depth. First pass over-darkened everything to a new near-black palette pulled from reference images — corrected after the fact once flagged, since the ask was "elevate the visual sophistication," not "change the app's overall tone."
@@ -34,7 +34,7 @@ Auth, the Dashboard home screen, and workout logging are all functional end-to-e
 - Visually redesigned to match the Dashboard's language: rounded cards (20px), no more flat left-color-bar accents (replaced with small icon badges on exercise headers), gradient CTAs, larger tap targets on the set check/remove buttons, and the same responsive max-width cap (480px mobile / 700px above 720px) so it doesn't stretch edge-to-edge on desktop. Only this file's own CSS module was touched — nothing else imports it, so no shared-class constraints like Dashboard had.
 - **Workout templates + retroactive (backdated) logging.** A date picker (defaults to today, capped at today via `max`) replaces the assumption that you're always logging "now" — picking a past date hides the live timer (doesn't make sense for a backdated entry) and saves `durationSeconds: 0` for it. Dashboard needed zero changes for this: its "today's workout" lookup, week strip, and streak calc were already purely driven by each workout's `date` field, so backdated entries just slot into the right day.
 - New `users/{uid}/templates/{id}` collection (`name` + an `exercises` list, no sets/weights — a template is a shape to fill in, not a record of a past performance), with matching Firestore rules validation (mirrors `isValidWorkout`'s pattern exactly) verified via the emulator before deploying, same as every other rules change this project has made. "Use Template" appends a saved template's exercises to the current list and sets the page title to the template's name (which also incidentally fixed the old hardcoded "Push Day" title — it now defaults to "Workout" and reflects whatever template you loaded, if any). "Save as Template" prompts for a name and stores the current exercise list for reuse.
-- Both "Save as Template" and the successful branch of "Save Workout" use native `window.prompt`/`alert` — same lightweight-dialog convention as the rest of the app (the delete-workout `window.confirm`, etc.), but worth remembering these block automated browser testing entirely (learned the hard way mid-session: clicking either one via the Claude-in-Chrome tooling froze the tab until manually dismissed). Test those two specific actions by hand, not via automation.
+- Both "Save as Template" and the successful branch of "Save Workout" used native `window.prompt`/`alert` at the time — same lightweight-dialog convention as the rest of the app (the delete-workout `window.confirm`, etc.), and these blocked automated browser testing entirely (learned the hard way mid-session: clicking either one via the Claude-in-Chrome tooling froze the tab until manually dismissed). All of these were later replaced with in-app modals — see "Replaced native alert/confirm/prompt..." below — which don't have this problem.
 
 **Security pass**
 - Reviewed live Firestore rules — confirmed they correctly scope all reads/writes to `request.auth.uid == userId` under `users/{uid}/**`, nothing was left open.
@@ -82,24 +82,49 @@ Auth, the Dashboard home screen, and workout logging are all functional end-to-e
 - Replaced plain "Loading..." text with shimmer skeleton placeholders — one for the app-startup auth check (`AppSkeleton.jsx`), one for the Dashboard's Firestore fetch (matches the real card layout so nothing jumps into place).
 
 **Recent Activity delete**
-- Added a delete button (with confirm prompt) to each Recent Activity row on the Dashboard, calling `deleteDoc` on that workout. No rules change needed — `firestore.rules` already granted `delete` to the owning user. Editing a past workout is still not possible, only deleting.
+- Added a delete button (with confirm prompt) to each Recent Activity row on the Dashboard, calling `deleteDoc` on that workout. No rules change needed — `firestore.rules` already granted `delete` to the owning user. (Editing was added later — see "Editing past workouts" below.)
 
 **Performance**
 - Re-encoded the three oversized PNGs (logo, two hero/background photos) to WebP — went from ~6.1MB combined to ~196KB, no visible quality loss at their actual display sizes. Logo was also downscaled from 1536x1024 (needed at ~100px tall) to 449x299.
 - Deleted unused leftover image assets (old jpg drafts, a stray `Login.png`, Vite's default `react.svg`/`vite.svg`) that weren't imported anywhere — didn't affect the build, but decluttered the repo.
 - Route-level code splitting via `React.lazy` + `Suspense` (fallback: `AppSkeleton`) — each page is now its own small chunk instead of one ~690KB bundle loaded upfront regardless of which page you land on.
 
+**Workout page rework: explicit Start/End instead of an always-on timer**
+- The live elapsed timer no longer starts the instant you land on `/workout` for today. It now requires clicking **Start Workout** (disabled until at least one exercise is added, with an inline hint explaining why), which locks the date picker and starts the timer. The button then becomes **End Workout**, disabled until at least one set is checked off complete — enough to stop a truly empty save, without forcing every planned set to be checked. A backdated (past-date) entry skips this whole state machine and goes straight to a single **Save Workout** button, unchanged from before.
+
+**Routines: a dedicated builder, replacing the "Template" name and its one-off UI**
+- New `/routines` page: list of saved routines (name, exercise count/preview, edit/delete) plus a builder card (name field + the same wger-backed exercise search Workout uses, chip list with remove buttons) to create or edit one directly — previously the only way to make one was to fake a live workout and hit "Save as Template".
+- Added to the navbar between Workout and Meals, and to the Dashboard as a stat tile (routine count, clickable through to `/routines`) in place of the old day-streak progress ring.
+- Rebranded "Template" → "Routine" everywhere user-facing (Workout page's quick-save/load buttons included) and swapped the layer-group icon for a clipboard. The Firestore collection stays named `templates` internally — renaming it would mean migrating already-live user data for a purely cosmetic change, so only the wording changed, noted with a comment at each call site.
+- Firestore `templates/{id}` docs now also support `updateDoc` (edit), not just create/delete — no rules changes needed since `isValidTemplate` already covered the same shape.
+
+**Editing past workouts**
+- Recent Activity rows get an Edit button (pencil, next to the existing delete) opening `/workout/:workoutId`, prefilled from the saved doc (date, exercises, sets, notes). Editing always shows a single **Save Changes** button that `updateDoc`s the existing workout, bypassing the Start/End gating and live timer entirely — editing is about correcting values, not re-living the session, so the original `durationSeconds` is preserved rather than re-timed.
+
+**Dashboard: week paging and click-to-open days**
+- The "This Week" day-strip now has prev/next arrows to page through past weeks. Paging is capped so it can't go past the current week, and can't go further back than the 30-day window the Dashboard actually fetches workout data for — paging past that would otherwise render a week as falsely empty rather than just not-yet-loaded. The card's title switches from "This Week" to the viewed date range once you've paged away; the stats-row "This Week" tile and its 4-week sparkline stay anchored to the real current week regardless of paging (and had its own redundant streak badge removed — the day-strip card above already shows it prominently, no need for it twice).
+- Every non-future day in the strip is now clickable: a day with a logged workout opens it in the edit page; an empty day opens a blank Workout page pre-filled with that date (via a new `?date=` query param `Workout.jsx` reads for its initial, non-editing date), so a backdated entry can be logged straight from the day you click.
+
+**Production incident: CSP silently blanked Workout and Routines on every visit**
+- Found live (user-reported): visiting `/workout` or `/routines` rendered a fully blank page, and once it happened, even navigating back to Dashboard stayed blank until a hard refresh. Root cause: the `Content-Security-Policy` header in `firebase.json` never allowlisted `fonts.googleapis.com`/`fonts.gstatic.com` for the Google Fonts `@import` every page's CSS module uses, so the browser blocked it — and for any route that Vite loads as its own lazy chunk (i.e. everything except Dashboard, whose CSS happens to get bundled into the shared eager stylesheet), that CSP violation makes Vite's route-level CSS preloader throw an uncaught error with no error boundary to catch it, crashing the whole React tree.
+- Fixed by allowlisting the two Google-owned font hosts in the CSP (`style-src`/`font-src`) rather than stripping the font — a hosting-header-only change, redeployed immediately without a rebuild. Verified live: both routes load cleanly now, and round-tripping Dashboard → Workout → Routines → Dashboard via client-side nav no longer needs a refresh. This had been live and broken since whichever deploy first enforced the CSP (it predates this session), not something introduced today — the original CSP verification pass apparently only exercised Dashboard, which doesn't hit this code path.
+
+**Replaced native alert/confirm/prompt with an in-app modal system**
+- New `ModalProvider` (mounted once at the App root) exposes `alert`/`confirm`/`prompt` via a `useModal()` hook (`src/hooks/useModal.js`), each returning a Promise so call sites read almost like the native functions they replace (`await modal.confirm(...)`, etc.). Styled to match the app's existing dark card language, with a danger (red) variant for destructive confirms, Escape-to-cancel, and autofocus on the primary control.
+- Swapped every `window.alert`/`confirm`/`prompt` call across Login, Verification, Profile, Dashboard, Routines, and Workout. Besides the visual upgrade, this fixes a real dev-workflow problem: native dialogs freeze the Claude-in-Chrome browser automation tooling mid-session (already flagged once in this doc for the Workout page's own alerts) — the custom modals don't.
+- Incidentally cleared the codebase's last pre-existing lint errors while touching these files: removed `Profile.jsx`'s long-dead unused `handleLogout` (Dashboard's own logout already covers that) and its now-unused `signOut` import, and dropped an unused `catch (error)` binding in `Verification.jsx`.
+
 ## What needs to be done / known gaps
 
 - **Meals & Progress have no real scope yet** — they're a shared "Coming Soon" placeholder page, no actual data model or features designed.
 - **Macro tracking** is explicitly deferred (the Dashboard tile says so) — no design work started.
-- **Recent Activity can be deleted but not edited** — no way to fix a mislogged past workout, only remove it entirely.
 - **Exercise picker is name-search only** — the wger data includes category/equipment/muscle group, but there's no filter/browse UI for it yet, just typeahead.
 - **Not mobile-responsive yet** — works fine on desktop viewports, needs a real pass for phone screens.
 - **No tests** — no unit/integration coverage anywhere (the new Firestore rules test is a one-off script, not a checked-in suite).
 - **Firebase API key isn't restricted in Google Cloud Console** — not a secret, so this is a "reduce blast radius" item rather than a real vulnerability. Restricting it to your domain + specific APIs (Cloud Console → APIs & Services → Credentials) means nobody could reuse a copied key against unrelated Google APIs on your billing account. This is a console action on your account, not something doable via CLI/code.
 - Workout set fields (`weight`, `reps`, `rir` in `Workout.jsx`) are saved as strings, not numbers — `updateSet` never casts the input value. Not a security issue (rules now correctly require `is string` to match reality), but worth knowing if you ever want to do numeric aggregation/sorting on set data.
-- The big remaining vendor JS chunk (~594KB, ~185KB gzip — React, react-router, Firebase, FontAwesome) still loads on every page since auth needs Firebase immediately; further splitting that would have diminishing returns for this app's size.
+- The big remaining vendor JS chunk (~664KB, ~206KB gzip — React, react-router, Firebase, FontAwesome, the new modal system) still loads on every page since auth needs Firebase immediately; further splitting that would have diminishing returns for this app's size.
+- **Dashboard week-paging can't go back further than 30 days** — it's capped at the Dashboard's existing 30-day fetch window on purpose (paging further would show a real week as falsely empty rather than just not-yet-loaded). Extending that would mean either widening the initial fetch or fetching per-viewed-week on demand — neither done yet.
 
 ## What I'd move forward with next
 
