@@ -1,0 +1,13 @@
+{
+  "name": "functions",
+  "description": "Cloud Functions for workout-tracker (billing safety net)",
+  "private": true,
+  "engines": {
+    "node": "20"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "firebase-functions": "^6.0.1",
+    "@google-cloud/billing": "^4.4.0"
+  }
+}
