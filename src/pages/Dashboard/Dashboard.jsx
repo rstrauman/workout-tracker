@@ -6,7 +6,7 @@ import { auth, db } from "../../firebase/firebase";
 import { signOut } from "firebase/auth";
 import { collection, doc, deleteDoc, getDoc, query, where, orderBy, getDocs, Timestamp } from "firebase/firestore";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDumbbell, faFire, faLightbulb, faChevronRight, faListCheck, faTrash, faPlus, faUser, faClipboardList } from '@fortawesome/free-solid-svg-icons';
+import { faDumbbell, faFire, faLightbulb, faChevronRight, faListCheck, faTrash, faPen, faPlus, faUser, faClipboardList } from '@fortawesome/free-solid-svg-icons';
 
 const DAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
 
@@ -413,6 +413,13 @@ function Dashboard() {
                                     <span className={`${styles.activityDuration} ${i % 2 ? styles.activityDurationPurple : ""}`}>
                                         {entry.duration}
                                     </span>
+                                    <button
+                                        className={styles.editActivityBtn}
+                                        onClick={() => navigate(`/workout/${entry.id}`)}
+                                        aria-label="Edit workout"
+                                    >
+                                        <FontAwesomeIcon icon={faPen} />
+                                    </button>
                                     <button
                                         className={styles.deleteActivityBtn}
                                         onClick={() => handleDeleteWorkout(entry.id)}

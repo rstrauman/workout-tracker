@@ -878,6 +878,25 @@ body {
     background: rgba(255, 44, 44, 0.12);
 }
 
+.editActivityBtn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: none;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--db-text-tertiary);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.editActivityBtn:hover {
+    color: var(--db-blue-400);
+    background: var(--db-blue-glow);
+}
+
 .emptyActivity {
     display: flex;
     flex-direction: column;

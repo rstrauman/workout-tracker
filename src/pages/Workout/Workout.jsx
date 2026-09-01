@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { auth, db } from "../../firebase/firebase";
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import { collection, addDoc, updateDoc, doc, getDoc, getDocs } from "firebase/firestore";
 import { signOut } from "firebase/auth";
 import styles from "./Workout.module.css";
 import Navbar from "../../components/Navbar";
@@ -39,6 +39,23 @@ function createExercise(name, meta = {}) {
     };
 }
 
+function hydrateExercise(ex) {
+    return {
+        id: nextId(),
+        name: ex.name,
+        notes: ex.notes || "",
+        category: ex.category || "",
+        equipment: ex.equipment || [],
+        sets: (ex.sets?.length ? ex.sets : [{}]).map((s) => ({
+            id: nextId(),
+            weight: s.weight ?? "",
+            reps: s.reps ?? "",
+            rir: s.rir ?? "",
+            completed: !!s.completed,
+        })),
+    };
+}
+
 function formatElapsed(totalSeconds) {
     const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, "0");
     const seconds = (totalSeconds % 60).toString().padStart(2, "0");
@@ -49,6 +66,10 @@ const TODAY_STR = toDateInputValue(new Date());
 
 function Workout() {
     const navigate = useNavigate();
+    const { workoutId } = useParams();
+    const isEditing = !!workoutId;
+    const [loadingWorkout, setLoadingWorkout] = useState(isEditing);
+    const [originalDuration, setOriginalDuration] = useState(0);
     const [exercises, setExercises] = useState([]);
     const [newExerciseName, setNewExerciseName] = useState("");
     const [elapsed, setElapsed] = useState(0);
@@ -93,6 +114,33 @@ function Workout() {
         };
         fetchRoutines();
     }, []);
+
+    useEffect(() => {
+        if (!isEditing) return;
+        const loadWorkout = async () => {
+            const user = auth.currentUser;
+            if (!user) return;
+            try {
+                const snap = await getDoc(doc(db, "users", user.uid, "workouts", workoutId));
+                if (!snap.exists()) {
+                    alert("Workout not found");
+                    navigate("/dashboard");
+                    return;
+                }
+                const data = snap.data();
+                const date = data.date?.toDate ? data.date.toDate() : new Date(data.date);
+                setWorkoutDateStr(toDateInputValue(date));
+                setOriginalDuration(data.durationSeconds || 0);
+                setExercises((data.exercises || []).map(hydrateExercise));
+            } catch (error) {
+                alert(error.message);
+                navigate("/dashboard");
+            } finally {
+                setLoadingWorkout(false);
+            }
+        };
+        loadWorkout();
+    }, [workoutId, isEditing, navigate]);
 
     const suggestions = newExerciseName.trim()
         ? exerciseLibrary
@@ -203,25 +251,31 @@ function Workout() {
             alert("Add at least one exercise before saving");
             return;
         }
-        if (isToday && started && completedSets === 0) {
+        if (!isEditing && isToday && started && completedSets === 0) {
             alert("Check off at least one set before ending your workout");
             return;
         }
 
-        try {
-            await addDoc(collection(db, "users", user.uid, "workouts"), {
-                date: parseDateInputValue(workoutDateStr),
-                durationSeconds: isToday ? elapsed : 0,
-                exercises: exercises.map((ex) => ({
-                    name: ex.name,
-                    notes: ex.notes,
-                    category: ex.category,
-                    equipment: ex.equipment,
-                    sets: ex.sets.map(({ weight, reps, rir, completed }) => ({ weight, reps, rir, completed })),
-                })),
-            });
+        const payload = {
+            date: parseDateInputValue(workoutDateStr),
+            durationSeconds: isEditing ? originalDuration : (isToday ? elapsed : 0),
+            exercises: exercises.map((ex) => ({
+                name: ex.name,
+                notes: ex.notes,
+                category: ex.category,
+                equipment: ex.equipment,
+                sets: ex.sets.map(({ weight, reps, rir, completed }) => ({ weight, reps, rir, completed })),
+            })),
+        };
 
-            alert("Workout saved!");
+        try {
+            if (isEditing) {
+                await updateDoc(doc(db, "users", user.uid, "workouts", workoutId), payload);
+            } else {
+                await addDoc(collection(db, "users", user.uid, "workouts"), payload);
+            }
+
+            alert(isEditing ? "Workout updated!" : "Workout saved!");
             navigate("/dashboard");
         } catch (error) {
             alert(error.message);
@@ -236,12 +290,25 @@ function Workout() {
         }
     };
 
+    if (loadingWorkout) {
+        return (
+            <div className={styles.main}>
+                <div className={styles.scrollArea}>
+                    <div className={`${styles.card} ${styles.emptyState}`}>
+                        <p>Loading workout...</p>
+                    </div>
+                </div>
+                <Navbar/>
+            </div>
+        );
+    }
+
     return (
         <div className={styles.main}>
             <div className={styles.scrollArea}>
                 <div className={styles.titleFlex}>
                     <div>
-                        <h2>{workoutTitle}</h2>
+                        <h2>{isEditing ? "Edit Workout" : workoutTitle}</h2>
                         <p className={styles.subText}>{completedSets}/{totalSets} sets completed</p>
                     </div>
                     <div className={styles.headerRight}>
@@ -421,7 +488,11 @@ function Workout() {
                     </button>
                 )}
 
-                {isToday && !started ? (
+                {isEditing ? (
+                    <button className={styles.saveBtn} onClick={saveWorkout}>
+                        <FontAwesomeIcon icon={faFloppyDisk} /> Save Changes
+                    </button>
+                ) : isToday && !started ? (
                     <>
                         <button
                             className={styles.saveBtn}

@@ -62,6 +62,7 @@ function App() {
             {/* <Route path="/onboarding" element={<Onboarding />} /> */}
 
             <Route path="/workout" element={<ProtectedRoute user={user}><Workout /></ProtectedRoute>} />
+            <Route path="/workout/:workoutId" element={<ProtectedRoute user={user}><Workout /></ProtectedRoute>} />
             <Route path="/routines" element={<ProtectedRoute user={user}><Routines /></ProtectedRoute>} />
 
             <Route path="/meals" element={<ProtectedRoute user={user}><ComingSoon title="Meals" icon={faUtensils} description="Meal logging and macro tracking are on the way." /></ProtectedRoute>} />
