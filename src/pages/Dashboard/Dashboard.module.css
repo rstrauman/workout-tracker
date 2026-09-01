@@ -765,36 +765,11 @@ body {
     transform: translateY(-1px);
 }
 
-.routineStatCard {
-    position: relative;
-}
-
-.weekStatCard {
-    position: relative;
-}
-
-.streakCornerBottom {
-    top: auto;
-    bottom: 10px;
-}
-
 .routineStatCard .statValue {
     background: var(--db-grad-purple);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-}
-
-.streakCorner {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    display: flex;
-    align-items: center;
-    gap: 3px;
-    font-size: 10.5px;
-    font-weight: 700;
-    color: var(--db-amber-400);
 }
 
 .macroCard {

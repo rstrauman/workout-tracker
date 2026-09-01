@@ -376,12 +376,7 @@ function Dashboard() {
 
                 {/* Stats row */}
                 <div className={styles.statsRow}>
-                    <div className={`${styles.statCard} ${styles.weekStatCard}`}>
-                        {!loading && (
-                            <span className={`${styles.streakCorner} ${styles.streakCornerBottom}`}>
-                                <FontAwesomeIcon icon={faFire} /> {streak}
-                            </span>
-                        )}
+                    <div className={styles.statCard}>
                         {loading ? (
                             <>
                                 <div className={styles.skeleton} style={{ width: 60, height: 10 }}></div>
