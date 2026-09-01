@@ -77,6 +77,7 @@ function Dashboard() {
     const modal = useModal();
     const [workouts, setWorkouts] = useState([]);
     const [firstName, setFirstName] = useState("");
+    const [photoURL, setPhotoURL] = useState("");
     const [routineCount, setRoutineCount] = useState(0);
     const [loading, setLoading] = useState(true);
     const [menuOpen, setMenuOpen] = useState(false);
@@ -136,6 +137,7 @@ function Dashboard() {
 
                 if (userDoc.exists()) {
                     setFirstName(userDoc.data().firstName || "");
+                    setPhotoURL(userDoc.data().photoURL || "");
                 }
             } catch (error) {
                 console.error("Failed to load dashboard data:", error);
@@ -245,7 +247,13 @@ function Dashboard() {
                             onBlur={() => setMenuOpen(false)}
                         >
                             <span className={styles.avatarCircle}>
-                                {firstName ? firstName[0].toUpperCase() : <FontAwesomeIcon icon={faUser} style={{ fontSize: 12 }} />}
+                                {photoURL ? (
+                                    <img src={photoURL} alt="" className={styles.avatarPhoto} />
+                                ) : firstName ? (
+                                    firstName[0].toUpperCase()
+                                ) : (
+                                    <FontAwesomeIcon icon={faUser} style={{ fontSize: 12 }} />
+                                )}
                             </span>
                         </button>
                         {menuOpen && (

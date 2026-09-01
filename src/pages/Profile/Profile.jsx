@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth, db } from "../../firebase/firebase";
+import { auth, db, storage } from "../../firebase/firebase";
 import { doc, setDoc, getDoc } from "firebase/firestore";
+import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import styles from "./Profile.module.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faHouse, faPen, faXmark } from '@fortawesome/free-solid-svg-icons'
+import { faHouse, faPen, faXmark, faCamera, faUser, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { useModal } from "../../hooks/useModal";
 
 const LBS_PER_KG = 2.20462;
@@ -39,6 +40,45 @@ function cmToInches(cm) {
     return Number.isFinite(n) ? n / CM_PER_IN : 0;
 }
 
+function withTimeout(promise, ms, message) {
+    return Promise.race([
+        promise,
+        new Promise((_, reject) => setTimeout(() => reject(new Error(message)), ms)),
+    ]);
+}
+
+function resizeImageToBlob(file, maxDimension = 512, quality = 0.85) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        const objectUrl = URL.createObjectURL(file);
+        img.onload = () => {
+            URL.revokeObjectURL(objectUrl);
+            let { width, height } = img;
+            if (width > height && width > maxDimension) {
+                height = Math.round((height / width) * maxDimension);
+                width = maxDimension;
+            } else if (height > maxDimension) {
+                width = Math.round((width / height) * maxDimension);
+                height = maxDimension;
+            }
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+            canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+            canvas.toBlob(
+                (blob) => (blob ? resolve(blob) : reject(new Error("Could not process that image"))),
+                "image/jpeg",
+                quality
+            );
+        };
+        img.onerror = () => {
+            URL.revokeObjectURL(objectUrl);
+            reject(new Error("Could not read that image file"));
+        };
+        img.src = objectUrl;
+    });
+}
+
 function Profile({isOnboarding = false}) {
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
@@ -50,6 +90,8 @@ function Profile({isOnboarding = false}) {
     const [tel, setTel] = useState("");
     const [goal, setGoal] = useState("Hypertrophy");
     const [activityLevel, setActivityLevel] = useState("Active");
+    const [photoURL, setPhotoURL] = useState("");
+    const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
     const [isEditing, setIsEditing] = useState(isOnboarding);
     const navigate = useNavigate();
@@ -76,6 +118,7 @@ function Profile({isOnboarding = false}) {
                     setTel(data.tel || "")
                     setGoal(data.goal || "Hypertrophy");
                     setActivityLevel(data.activityLevel || "Moderate");
+                    setPhotoURL(data.photoURL || "");
                 }
             }
         };
@@ -101,6 +144,47 @@ function Profile({isOnboarding = false}) {
         setUnitSystem(nextUnit);
     };
 
+    const handlePhotoChange = async (e) => {
+        const file = e.target.files?.[0];
+        e.target.value = "";
+        if (!file) return;
+        if (!file.type.startsWith("image/")) {
+            await modal.alert("Please choose an image file.");
+            return;
+        }
+        const user = auth.currentUser;
+        if (!user) return;
+
+        setUploadingPhoto(true);
+        try {
+            const blob = await resizeImageToBlob(file);
+            const photoRef = storageRef(storage, `users/${user.uid}/profile.jpg`);
+            await withTimeout(
+                uploadBytes(photoRef, blob, { contentType: "image/jpeg" }),
+                15000,
+                "Photo upload timed out. Please try again in a moment."
+            );
+            const url = await getDownloadURL(photoRef);
+            setPhotoURL(url);
+        } catch (error) {
+            await modal.alert(error.message);
+        } finally {
+            setUploadingPhoto(false);
+        }
+    };
+
+    const handleRemovePhoto = async () => {
+        const user = auth.currentUser;
+        if (user) {
+            try {
+                await deleteObject(storageRef(storage, `users/${user.uid}/profile.jpg`));
+            } catch {
+                // nothing to delete, or it's already gone - fine either way
+            }
+        }
+        setPhotoURL("");
+    };
+
     const handleSave = async () => {
         const user = auth.currentUser;
         if (!user) return;
@@ -121,6 +205,7 @@ function Profile({isOnboarding = false}) {
                 tel,
                 goal,
                 activityLevel,
+                photoURL,
                 isProfileComplete: true,
                 updatedAt: new Date()
                 }, { merge: true });
@@ -158,6 +243,34 @@ function Profile({isOnboarding = false}) {
                 {!isOnboarding && isEditing && (
                     <button onClick={() => setIsEditing(false)} className={styles.exitIcon} aria-label="Cancel editing">
                         <FontAwesomeIcon icon={faXmark} />
+                    </button>
+                )}
+            </div>
+            <div className={styles.avatarRow}>
+                <div className={styles.avatarWrap}>
+                    {photoURL ? (
+                        <img src={photoURL} alt="Profile" className={styles.avatarImg} />
+                    ) : (
+                        <div className={styles.avatarFallback}>
+                            {firstName ? firstName[0].toUpperCase() : <FontAwesomeIcon icon={faUser} />}
+                        </div>
+                    )}
+                    {isEditing && (
+                        <label className={styles.avatarEditBadge} aria-label="Change profile photo">
+                            <FontAwesomeIcon icon={uploadingPhoto ? faSpinner : faCamera} spin={uploadingPhoto} />
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handlePhotoChange}
+                                disabled={uploadingPhoto}
+                                className={styles.avatarInput}
+                            />
+                        </label>
+                    )}
+                </div>
+                {isEditing && photoURL && (
+                    <button type="button" className={styles.removePhotoBtn} onClick={handleRemovePhoto}>
+                        Remove photo
                     </button>
                 )}
             </div>
