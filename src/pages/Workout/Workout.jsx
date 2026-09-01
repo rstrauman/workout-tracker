@@ -1,16 +1,28 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../../firebase/firebase";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, getDocs } from "firebase/firestore";
 import { signOut } from "firebase/auth";
 import styles from "./Workout.module.css";
 import Navbar from "../../components/Navbar";
 import { fetchExerciseLibrary } from "../../services/exerciseApi";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faTrash, faCheck, faDumbbell, faClock, faFloppyDisk } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faTrash, faCheck, faDumbbell, faClock, faFloppyDisk, faLayerGroup, faBookmark } from '@fortawesome/free-solid-svg-icons';
 
 let idCounter = 0;
 const nextId = () => `id-${Date.now()}-${idCounter++}`;
+
+function toDateInputValue(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+}
+
+function parseDateInputValue(str) {
+    const [y, m, d] = str.split("-").map(Number);
+    return new Date(y, m - 1, d);
+}
 
 function createSet() {
     return { id: nextId(), weight: "", reps: "", rir: "", completed: false };
@@ -33,6 +45,8 @@ function formatElapsed(totalSeconds) {
     return `${minutes}:${seconds}`;
 }
 
+const TODAY_STR = toDateInputValue(new Date());
+
 function Workout() {
     const navigate = useNavigate();
     const [exercises, setExercises] = useState([]);
@@ -42,17 +56,38 @@ function Workout() {
     const [libraryLoading, setLibraryLoading] = useState(true);
     const [libraryError, setLibraryError] = useState(false);
     const [showSuggestions, setShowSuggestions] = useState(false);
+    const [workoutDateStr, setWorkoutDateStr] = useState(TODAY_STR);
+    const [workoutTitle, setWorkoutTitle] = useState("Workout");
+    const [templates, setTemplates] = useState([]);
+    const [showTemplates, setShowTemplates] = useState(false);
+
+    const isToday = workoutDateStr === TODAY_STR;
 
     useEffect(() => {
+        if (!isToday) return;
         const timer = setInterval(() => setElapsed((e) => e + 1), 1000);
         return () => clearInterval(timer);
-    }, []);
+    }, [isToday]);
 
     useEffect(() => {
         fetchExerciseLibrary()
             .then(setExerciseLibrary)
             .catch(() => setLibraryError(true))
             .finally(() => setLibraryLoading(false));
+    }, []);
+
+    useEffect(() => {
+        const fetchTemplates = async () => {
+            const user = auth.currentUser;
+            if (!user) return;
+            try {
+                const snapshot = await getDocs(collection(db, "users", user.uid, "templates"));
+                setTemplates(snapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() })));
+            } catch (error) {
+                console.error("Failed to load templates:", error);
+            }
+        };
+        fetchTemplates();
     }, []);
 
     const suggestions = newExerciseName.trim()
@@ -76,6 +111,36 @@ function Workout() {
 
     const removeExercise = (exerciseId) => {
         setExercises(exercises.filter((ex) => ex.id !== exerciseId));
+    };
+
+    const loadTemplate = (template) => {
+        setExercises([
+            ...exercises,
+            ...template.exercises.map((ex) => createExercise(ex.name, { category: ex.category, equipment: ex.equipment })),
+        ]);
+        setWorkoutTitle(template.name);
+        setShowTemplates(false);
+    };
+
+    const saveAsTemplate = async () => {
+        const user = auth.currentUser;
+        if (!user || !exercises.length) return;
+
+        const name = window.prompt("Name this template (e.g. Push Day)");
+        if (!name || !name.trim()) return;
+
+        try {
+            const templateData = {
+                name: name.trim(),
+                exercises: exercises.map((ex) => ({ name: ex.name, category: ex.category, equipment: ex.equipment })),
+                createdAt: new Date(),
+            };
+            const docRef = await addDoc(collection(db, "users", user.uid, "templates"), templateData);
+            setTemplates([...templates, { id: docRef.id, ...templateData }]);
+            alert("Template saved!");
+        } catch (error) {
+            alert(error.message);
+        }
     };
 
     const addSet = (exerciseId) => {
@@ -129,8 +194,8 @@ function Workout() {
 
         try {
             await addDoc(collection(db, "users", user.uid, "workouts"), {
-                date: new Date(),
-                durationSeconds: elapsed,
+                date: parseDateInputValue(workoutDateStr),
+                durationSeconds: isToday ? elapsed : 0,
                 exercises: exercises.map((ex) => ({
                     name: ex.name,
                     notes: ex.notes,
@@ -160,14 +225,55 @@ function Workout() {
             <div className={styles.scrollArea}>
                 <div className={styles.titleFlex}>
                     <div>
-                        <h2>Push Day</h2>
+                        <h2>{workoutTitle}</h2>
                         <p className={styles.subText}>{completedSets}/{totalSets} sets completed</p>
                     </div>
-                    <div className={styles.timer}>
-                        <FontAwesomeIcon icon={faClock} />
-                        {formatElapsed(elapsed)}
+                    <div className={styles.headerRight}>
+                        <input
+                            type="date"
+                            className={styles.dateInput}
+                            value={workoutDateStr}
+                            max={TODAY_STR}
+                            onChange={(e) => setWorkoutDateStr(e.target.value)}
+                        />
+                        {isToday && (
+                            <div className={styles.timer}>
+                                <FontAwesomeIcon icon={faClock} />
+                                {formatElapsed(elapsed)}
+                            </div>
+                        )}
                     </div>
                 </div>
+
+                {templates.length > 0 && (
+                    <div className={styles.templateWrap}>
+                        <button
+                            className={styles.templateBtn}
+                            onClick={() => setShowTemplates((s) => !s)}
+                            onBlur={() => setShowTemplates(false)}
+                        >
+                            <FontAwesomeIcon icon={faLayerGroup} /> Use Template
+                        </button>
+                        {showTemplates && (
+                            <div className={styles.suggestionList}>
+                                {templates.map((t) => (
+                                    <div
+                                        className={styles.suggestionItem}
+                                        key={t.id}
+                                        onMouseDown={() => loadTemplate(t)}
+                                    >
+                                        <div className={styles.suggestionText}>
+                                            <span className={styles.suggestionName}>{t.name}</span>
+                                            <span className={styles.suggestionMeta}>
+                                                {t.exercises.length} exercise{t.exercises.length !== 1 ? "s" : ""}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 <div className={styles.exerciseList}>
                     {exercises.map((ex) => (
@@ -291,6 +397,12 @@ function Workout() {
                         <FontAwesomeIcon icon={faPlus} /> Add Exercise
                     </button>
                 </div>
+
+                {exercises.length > 0 && (
+                    <button className={styles.saveTemplateBtn} onClick={saveAsTemplate}>
+                        <FontAwesomeIcon icon={faBookmark} /> Save as Template
+                    </button>
+                )}
 
                 <button className={styles.saveBtn} onClick={saveWorkout}>
                     <FontAwesomeIcon icon={faFloppyDisk} /> Save Workout

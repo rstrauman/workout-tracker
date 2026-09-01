@@ -33,6 +33,13 @@ service cloud.firestore {
              && data.exercises is list;
     }
 
+    function isValidTemplate(data) {
+      return data.keys().hasOnly(['name', 'exercises', 'createdAt'])
+             && data.name is string
+             && data.exercises is list
+             && (!('createdAt' in data) || data.createdAt is timestamp);
+    }
+
     match /users/{userId} {
       allow read, delete: if isOwner(userId);
       allow create, update: if isOwner(userId) && isValidUserDoc(request.resource.data);
@@ -40,6 +47,11 @@ service cloud.firestore {
       match /workouts/{workoutId} {
         allow read, delete: if isOwner(userId);
         allow create, update: if isOwner(userId) && isValidWorkout(request.resource.data);
+      }
+
+      match /templates/{templateId} {
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidTemplate(request.resource.data);
       }
     }
   }
