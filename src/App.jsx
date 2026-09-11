@@ -7,7 +7,7 @@ import { doc, getDoc } from "firebase/firestore";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AppSkeleton from "./components/AppSkeleton";
 import ModalProvider from "./components/ModalProvider";
-import { faUtensils, faChartLine } from '@fortawesome/free-solid-svg-icons';
+import { faUtensils } from '@fortawesome/free-solid-svg-icons';
 
 const Login = lazy(() => import("./pages/Login/Login"));
 const Verification = lazy(() => import("./pages/Verification/Verification"));
@@ -15,6 +15,7 @@ const Profile = lazy(() => import("./pages/Profile/Profile"));
 const Dashboard = lazy(() => import("./pages/Dashboard/Dashboard"));
 const Workout = lazy(() => import("./pages/Workout/Workout"));
 const Routines = lazy(() => import("./pages/Routines/Routines"));
+const Progress = lazy(() => import("./pages/Progress/Progress"));
 const ComingSoon = lazy(() => import("./pages/ComingSoon/ComingSoon"));
 const NotFound = lazy(() => import("./pages/NotFound/NotFound"));
 
@@ -68,7 +69,7 @@ function App() {
             <Route path="/routines" element={<ProtectedRoute user={user}><Routines /></ProtectedRoute>} />
 
             <Route path="/meals" element={<ProtectedRoute user={user}><ComingSoon title="Meals" icon={faUtensils} description="Meal logging and macro tracking are on the way." /></ProtectedRoute>} />
-            <Route path="/progress" element={<ProtectedRoute user={user}><ComingSoon title="Progress" icon={faChartLine} description="Long-term progress charts and PR tracking are on the way." /></ProtectedRoute>} />
+            <Route path="/progress" element={<ProtectedRoute user={user}><Progress /></ProtectedRoute>} />
 
             <Route path="*" element={<NotFound />} />
         </Routes>

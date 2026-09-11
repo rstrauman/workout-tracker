@@ -1,0 +1,574 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap');
+
+/* ==========================================================================
+   1. VARIABLES & GLOBAL BASICS
+   ========================================================================== */
+:root {
+    --bg-deep: #121212;
+    --bg-surface: #1e1e1e;
+    --bg-surface-2: #262626;
+    --text-main: #ffffff;
+    --text-muted: #a0aec0;
+    --accent: #3b82f6;
+    --accent-light: #60a5fa;
+    --accent-hover: #2563eb;
+    --accent-bg: rgba(59, 130, 246, 0.12);
+    --accent-border: rgba(59, 130, 246, 0.4);
+    --accent-2: #a855f7;
+    --accent-2-light: #d68bff;
+    --accent-2-hover: #9333ea;
+    --accent-2-bg: rgba(168, 85, 247, 0.12);
+    --accent-2-border: rgba(168, 85, 247, 0.4);
+    --danger: #ff5c5c;
+    --border: #444;
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --grad-blue: linear-gradient(135deg, var(--accent-light), var(--accent-hover));
+    --grad-purple: linear-gradient(135deg, var(--accent-2-light), var(--accent-2-hover));
+}
+
+body {
+    background: linear-gradient(180deg, var(--bg-surface), var(--bg-deep));
+    margin: 0;
+}
+
+/* ==========================================================================
+   2. MAIN SITE LAYOUT
+   ========================================================================== */
+.main {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    width: 100%;
+    height: 100svh;
+    color: #fff;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.scrollArea {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 14px;
+    padding: 0 20px 14px;
+    overflow-y: auto;
+    min-height: 0;
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+@media (min-width: 720px) {
+    .scrollArea {
+        max-width: 700px;
+    }
+}
+
+.titleFlex {
+    padding-top: 20px;
+}
+
+.titleFlex h2 {
+    margin: 0;
+    text-align: left;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-size: 21px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+.subText {
+    margin: 4px 0 0;
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+/* ==========================================================================
+   3. CARDS & SECTION HEADERS
+   ========================================================================== */
+.card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: 20px;
+    box-shadow: 0 8px 22px rgba(0,0,0,0.35);
+    position: relative;
+}
+
+.sectionHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.sectionHeader h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.headerIconBadge {
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    background: var(--accent-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-light);
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+.emptyState {
+    align-items: center;
+    text-align: center;
+    padding: 28px 16px;
+}
+
+.emptyState p {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin: 0;
+}
+
+.inlineEmptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+    padding: 20px 12px;
+    border: 1.5px dashed var(--border);
+    border-radius: 14px;
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.inlineEmptyState p {
+    margin: 0;
+}
+
+.mutedNote {
+    margin: 0;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+/* ==========================================================================
+   4. BODY WEIGHT SECTION
+   ========================================================================== */
+.logBtn {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    outline: none;
+    border: none;
+    border-radius: 999px;
+    background: var(--grad-blue);
+    color: #fff;
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.logBtn:hover {
+    background: linear-gradient(135deg, var(--accent-light), var(--accent));
+    transform: translateY(-1px);
+}
+
+.weightRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.weightReadout {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.weightValue {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.weightDelta {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.goalRingWrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.goalRingLabel {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.goalRingSub {
+    font-size: 8.5px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.setGoalBtn {
+    flex-shrink: 0;
+    padding: 9px 14px;
+    outline: none;
+    border: 1.5px dashed var(--border);
+    border-radius: 12px;
+    background: transparent;
+    color: var(--accent-light);
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    white-space: nowrap;
+}
+
+.setGoalBtn:hover {
+    border-color: var(--accent);
+    background: var(--accent-bg);
+}
+
+.trendSvg {
+    width: 100%;
+    height: 90px;
+    display: block;
+}
+
+/* ==========================================================================
+   5. STRENGTH PROGRESS SECTION
+   ========================================================================== */
+.exerciseChipRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.exerciseChipBtn {
+    padding: 7px 14px;
+    outline: none;
+    border: 1px solid var(--border-subtle);
+    border-radius: 999px;
+    background: var(--bg-surface-2);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.exerciseChipBtn:hover {
+    border-color: var(--accent-2-border);
+}
+
+.exerciseChipBtnActive {
+    background: var(--accent-2-bg);
+    border-color: var(--accent-2-border);
+    color: var(--accent-2-light);
+}
+
+.goalRow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.goalRowText {
+    flex: 1;
+    min-width: 0;
+}
+
+.goalRowTitle {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.goalRowSub {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.iconBtn {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    border: none;
+    background: var(--bg-surface-2);
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 13px;
+    padding: 0;
+    flex-shrink: 0;
+    transition: all 0.2s ease-in-out;
+}
+
+.iconBtn:hover {
+    background: var(--accent-2-bg);
+    color: var(--accent-2-light);
+}
+
+.goalsList {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-top: 4px;
+    border-top: 1px solid var(--border-subtle);
+}
+
+.goalsListTitle {
+    margin: 4px 0 0;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--text-muted);
+}
+
+.goalListItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    outline: none;
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    background: var(--bg-surface-2);
+    color: var(--text-main);
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.goalListItem:hover {
+    border-color: var(--accent-2-border);
+}
+
+.goalListTarget {
+    color: var(--text-muted);
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.newGoalBtn {
+    padding: 11px;
+    outline: none;
+    border: 1.5px dashed var(--border);
+    border-radius: 14px;
+    background: transparent;
+    color: var(--accent-2-light);
+    font-weight: 600;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.newGoalBtn:hover {
+    border-color: var(--accent-2);
+    background: var(--accent-2-bg);
+}
+
+/* ==========================================================================
+   6. GOAL BUILDER
+   ========================================================================== */
+.goalBuilderCard {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 4px;
+    border-top: 1px solid var(--border-subtle);
+}
+
+.exerciseSearchWrap {
+    position: relative;
+}
+
+.exerciseSearchWrap input {
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--bg-surface-2);
+    border: 1px solid var(--border-subtle);
+    border-radius: 13px;
+    padding: 11px 16px;
+    color: var(--text-main);
+    font-size: 14px;
+    transition: all 0.2s ease-in-out;
+}
+
+.exerciseSearchWrap input:hover {
+    border-color: var(--text-muted);
+}
+
+.exerciseSearchWrap input:focus {
+    outline: none;
+    border-color: var(--accent-2);
+}
+
+.suggestionList {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    box-shadow: 0 8px 22px rgba(0,0,0,0.4);
+    max-height: 260px;
+    overflow-y: auto;
+    z-index: 20;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.suggestionItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    border-radius: 11px;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s ease-in-out;
+}
+
+.suggestionItem:hover {
+    background: var(--accent-2-bg);
+}
+
+.suggestionText {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.suggestionName {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-main);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.suggestionMeta {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: capitalize;
+}
+
+.goalInputRow {
+    display: flex;
+    gap: 10px;
+}
+
+.goalInputRow input {
+    flex: 1;
+    min-width: 0;
+    box-sizing: border-box;
+    background: var(--bg-surface-2);
+    border: 1px solid var(--border-subtle);
+    border-radius: 13px;
+    padding: 11px 14px;
+    color: var(--text-main);
+    font-size: 14px;
+    transition: all 0.2s ease-in-out;
+}
+
+.goalInputRow input:focus {
+    outline: none;
+    border-color: var(--accent-2);
+}
+
+.builderActions {
+    display: flex;
+    gap: 10px;
+}
+
+.cancelBtn {
+    flex: 1;
+    padding: 13px;
+    outline: none;
+    border: 1.5px solid var(--border-subtle);
+    border-radius: 14px;
+    background: transparent;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.cancelBtn:hover {
+    border-color: var(--text-muted);
+    color: var(--text-main);
+}
+
+.saveBtn {
+    flex: 2;
+    padding: 13px;
+    outline: none;
+    border: none;
+    border-radius: 14px;
+    background: var(--grad-purple);
+    color: #fff;
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.25s ease-in-out;
+    box-shadow: 0 8px 20px rgba(168, 85, 247, 0.3);
+}
+
+.saveBtn:hover {
+    background: linear-gradient(135deg, var(--accent-2-light), var(--accent-2));
+    transform: translateY(-1px);
+}
+
+.saveBtn:active {
+    transform: translateY(0);
+}

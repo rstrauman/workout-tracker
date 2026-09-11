@@ -141,7 +141,7 @@ function Routines() {
         setShowBuilder(true);
     };
 
-    const useSampleRoutine = (sample) => {
+    const applySampleRoutine = (sample) => {
         setEditingId(null);
         setRoutineName(sample.name);
         setBuilderExercises(sample.exercises.map((ex) => ({ id: nextId(), ...ex })));
@@ -329,7 +329,7 @@ function Routines() {
                                             <span className={styles.headerIconBadge}><FontAwesomeIcon icon={faClipboardList} /></span>
                                             {sample.name}
                                         </h3>
-                                        <button className={styles.useSampleBtn} onClick={() => useSampleRoutine(sample)}>
+                                        <button className={styles.useSampleBtn} onClick={() => applySampleRoutine(sample)}>
                                             <FontAwesomeIcon icon={faPlus} /> Use
                                         </button>
                                     </div>

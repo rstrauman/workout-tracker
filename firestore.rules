@@ -10,7 +10,7 @@ service cloud.firestore {
     function isValidUserDoc(data) {
       return data.keys().hasOnly([
                'email', 'createdAt', 'updatedAt', 'isProfileComplete',
-               'firstName', 'lastName', 'weight', 'height', 'tel', 'goal', 'activityLevel', 'unitSystem', 'photoURL'
+               'firstName', 'lastName', 'weight', 'height', 'tel', 'goal', 'activityLevel', 'unitSystem', 'photoURL', 'targetWeight'
              ])
              && data.email == request.auth.token.email
              && data.isProfileComplete is bool
@@ -24,7 +24,8 @@ service cloud.firestore {
              && (!('goal' in data) || data.goal is string)
              && (!('activityLevel' in data) || data.activityLevel is string)
              && (!('unitSystem' in data) || data.unitSystem in ['imperial', 'metric'])
-             && (!('photoURL' in data) || data.photoURL is string);
+             && (!('photoURL' in data) || data.photoURL is string)
+             && (!('targetWeight' in data) || data.targetWeight is number);
     }
 
     function isValidWorkout(data) {
@@ -41,6 +42,20 @@ service cloud.firestore {
              && (!('createdAt' in data) || data.createdAt is timestamp);
     }
 
+    function isValidWeightLog(data) {
+      return data.keys().hasOnly(['weightLbs', 'loggedAt'])
+             && data.weightLbs is number
+             && data.loggedAt is timestamp;
+    }
+
+    function isValidStrengthGoal(data) {
+      return data.keys().hasOnly(['exerciseName', 'targetWeightLbs', 'targetReps', 'createdAt'])
+             && data.exerciseName is string
+             && data.targetWeightLbs is number
+             && data.targetReps is number
+             && (!('createdAt' in data) || data.createdAt is timestamp);
+    }
+
     match /users/{userId} {
       allow read, delete: if isOwner(userId);
       allow create, update: if isOwner(userId) && isValidUserDoc(request.resource.data);
@@ -53,6 +68,16 @@ service cloud.firestore {
       match /templates/{templateId} {
         allow read, delete: if isOwner(userId);
         allow create, update: if isOwner(userId) && isValidTemplate(request.resource.data);
+      }
+
+      match /weightLogs/{logId} {
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidWeightLog(request.resource.data);
+      }
+
+      match /strengthGoals/{goalId} {
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidStrengthGoal(request.resource.data);
       }
     }
   }

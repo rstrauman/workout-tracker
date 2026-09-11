@@ -7,20 +7,9 @@ import styles from "./Profile.module.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faHouse, faPen, faXmark, faCamera, faUser, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { useModal } from "../../hooks/useModal";
+import { lbsToDisplayWeight, displayWeightToLbs } from "../../utils/units";
 
-const LBS_PER_KG = 2.20462;
 const CM_PER_IN = 2.54;
-
-function lbsToDisplayWeight(lbs, unit) {
-    if (!Number.isFinite(lbs)) return "";
-    return unit === "metric" ? Math.round((lbs / LBS_PER_KG) * 10) / 10 : Math.round(lbs);
-}
-
-function displayWeightToLbs(value, unit) {
-    const n = Number(value);
-    if (!Number.isFinite(n)) return 0;
-    return unit === "metric" ? n * LBS_PER_KG : n;
-}
 
 function inchesToFeetAndInches(totalInches) {
     if (!Number.isFinite(totalInches)) return { feet: "", inches: "" };
