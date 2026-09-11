@@ -57,6 +57,11 @@ function hydrateExercise(ex) {
     };
 }
 
+function toNumericSetField(value) {
+    const n = Number(value);
+    return Number.isFinite(n) ? n : 0;
+}
+
 function formatElapsed(totalSeconds) {
     const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, "0");
     const seconds = (totalSeconds % 60).toString().padStart(2, "0");
@@ -271,7 +276,12 @@ function Workout() {
                 notes: ex.notes,
                 category: ex.category,
                 equipment: ex.equipment,
-                sets: ex.sets.map(({ weight, reps, rir, completed }) => ({ weight, reps, rir, completed })),
+                sets: ex.sets.map(({ weight, reps, rir, completed }) => ({
+                    weight: toNumericSetField(weight),
+                    reps: toNumericSetField(reps),
+                    rir: toNumericSetField(rir),
+                    completed,
+                })),
             })),
         };
 
