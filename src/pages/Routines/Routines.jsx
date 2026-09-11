@@ -11,6 +11,40 @@ import { useModal } from "../../hooks/useModal";
 let idCounter = 0;
 const nextId = () => `id-${Date.now()}-${idCounter++}`;
 
+const SAMPLE_ROUTINES = [
+    {
+        name: "Beginner Leg Day",
+        exercises: [
+            { name: "Goblet Squat", category: "Legs", equipment: ["Dumbbell"] },
+            { name: "Dumbbell Romanian Deadlift", category: "Legs", equipment: ["Dumbbell"] },
+            { name: "Leg Extension", category: "Legs", equipment: ["Machine"] },
+            { name: "Leg Curl", category: "Legs", equipment: ["Machine"] },
+            { name: "Calf Raise", category: "Legs", equipment: ["Machine"] },
+        ],
+    },
+    {
+        name: "Beginner Upper Day",
+        exercises: [
+            { name: "Dumbbell Bench Press", category: "Chest", equipment: ["Dumbbell"] },
+            { name: "Lat Pulldown", category: "Back", equipment: ["Cable"] },
+            { name: "Seated Cable Row", category: "Back", equipment: ["Cable"] },
+            { name: "Dumbbell Shoulder Press", category: "Shoulders", equipment: ["Dumbbell"] },
+            { name: "Dumbbell Bicep Curl", category: "Arms", equipment: ["Dumbbell"] },
+            { name: "Triceps Pushdown", category: "Arms", equipment: ["Cable"] },
+        ],
+    },
+    {
+        name: "Beginner Full Body",
+        exercises: [
+            { name: "Goblet Squat", category: "Legs", equipment: ["Dumbbell"] },
+            { name: "Dumbbell Chest Press", category: "Chest", equipment: ["Dumbbell"] },
+            { name: "Lat Pulldown", category: "Back", equipment: ["Cable"] },
+            { name: "Dumbbell Romanian Deadlift", category: "Legs", equipment: ["Dumbbell"] },
+            { name: "Plank", category: "Core", equipment: ["Bodyweight"] },
+        ],
+    },
+];
+
 // Stored in the same Firestore collection ("templates") that predates the
 // "Routines" rebrand — renaming the collection would mean migrating already-live
 // user data for a purely cosmetic change, so only the user-facing wording changed.
@@ -104,6 +138,13 @@ function Routines() {
                 equipment: ex.equipment || [],
             }))
         );
+        setShowBuilder(true);
+    };
+
+    const useSampleRoutine = (sample) => {
+        setEditingId(null);
+        setRoutineName(sample.name);
+        setBuilderExercises(sample.exercises.map((ex) => ({ id: nextId(), ...ex })));
         setShowBuilder(true);
     };
 
@@ -262,17 +303,43 @@ function Routines() {
                             </div>
                             <p className={styles.routineMeta}>
                                 {r.exercises.length} exercise{r.exercises.length !== 1 ? "s" : ""}
-                                {r.exercises.length ? ` • ${r.exercises.map((ex) => ex.name).join(", ")}` : ""}
                             </p>
+                            {r.exercises.length > 0 && (
+                                <div className={styles.exerciseChipList}>
+                                    {r.exercises.slice(0, 6).map((ex, i) => (
+                                        <span className={styles.exerciseChip} key={i}>{ex.name}</span>
+                                    ))}
+                                    {r.exercises.length > 6 && (
+                                        <span className={styles.exerciseChipMore}>+{r.exercises.length - 6} more</span>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     ))}
 
                     {!loading && !routines.length && !showBuilder && (
-                        <div className={`${styles.card} ${styles.emptyState}`}>
-                            <div className={styles.emptyStateIcon}>
-                                <FontAwesomeIcon icon={faClipboardList} />
-                            </div>
-                            <p>No routines yet. Build one above to reuse it anytime.</p>
+                        <div className={styles.sampleSection}>
+                            <p className={styles.sampleIntro}>
+                                Not sure what to try? Start from a sample routine:
+                            </p>
+                            {SAMPLE_ROUTINES.map((sample) => (
+                                <div className={`${styles.card} ${styles.sampleCard}`} key={sample.name}>
+                                    <div className={styles.routineHeader}>
+                                        <h3>
+                                            <span className={styles.headerIconBadge}><FontAwesomeIcon icon={faClipboardList} /></span>
+                                            {sample.name}
+                                        </h3>
+                                        <button className={styles.useSampleBtn} onClick={() => useSampleRoutine(sample)}>
+                                            <FontAwesomeIcon icon={faPlus} /> Use
+                                        </button>
+                                    </div>
+                                    <div className={styles.exerciseChipList}>
+                                        {sample.exercises.map((ex) => (
+                                            <span className={styles.exerciseChip} key={ex.name}>{ex.name}</span>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     )}
                 </div>
