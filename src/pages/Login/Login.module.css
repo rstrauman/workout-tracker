@@ -240,9 +240,52 @@ button:active {
 }
 
 .imageOverlay p:nth-child(1) { margin-right: 60px; }
-.imageOverlay p:nth-child(2) { margin-right: 30px; } 
-.imageOverlay p:nth-child(3) { margin-right: 0; }    
+.imageOverlay p:nth-child(2) { margin-right: 30px; }
+.imageOverlay p:nth-child(3) { margin-right: 0; }
 
 .overlayImage p:nth-child(1) { margin-right: 0px; }
-.overlayImage p:nth-child(2) { margin-right: 30px; } 
-.overlayImage p:nth-child(3) { margin-right: 60; } 
+.overlayImage p:nth-child(2) { margin-right: 30px; }
+.overlayImage p:nth-child(3) { margin-right: 60; }
+
+@media (max-width: 720px) {
+    .rightImage, .leftImage {
+        display: none;
+    }
+
+    .formCard {
+        justify-content: center;
+    }
+
+    .loginDetails {
+        flex: 1;
+        width: 100%;
+        max-width: 420px;
+        margin: 0 auto;
+        padding: 0 24px;
+        border-right: none;
+        box-sizing: border-box;
+    }
+
+    .logo, .logoReg {
+        height: 64px;
+        top: 16px;
+    }
+
+    .logo {
+        left: 16px;
+    }
+
+    .logoReg {
+        right: 16px;
+    }
+
+    .loginDetails input[type = "email"], .loginDetails input[type = "password"] {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .mainBtn {
+        width: 100%;
+        box-sizing: border-box;
+    }
+}
