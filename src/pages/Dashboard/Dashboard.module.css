@@ -167,7 +167,7 @@ body {
     display: flex;
     place-items: center;
     flex-shrink: 0;
-    background: rgba(23, 25, 34, 0.94);
+    background: rgba(18, 18, 18, 0.94);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     border-top: 1px solid rgba(255, 255, 255, 0.07);
@@ -180,7 +180,7 @@ body {
     width: 100%;
     max-width: 480px;
     margin: 0 auto;
-    padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
+    padding: calc(6px + env(safe-area-inset-bottom, 0px) * 0.5) 6px;
     list-style: none;
     box-sizing: border-box;
 }
@@ -205,22 +205,37 @@ body {
     gap: 4px;
     width: 100%;
     min-height: 48px;
+    margin: 0 2px;
     padding: 6px 0;
+    border-radius: 12px;
     color: var(--text-muted);
     text-decoration: none;
     font-weight: 600;
     font-size: 10px;
     cursor: pointer;
     position: relative;
-    transition: color 0.2s ease-in-out;
+    transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
 }
 
 .navItem svg {
     font-size: 18px;
+    transition: transform 0.2s ease-in-out;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .navItem:hover {
+        color: var(--accent-light);
+        background: var(--accent-bg);
+    }
+
+    .navItem:hover svg {
+        transform: translateY(-1px);
+    }
 }
 
 .navItem p {
     margin: 0;
+    line-height: 1;
 }
 
 .navIndicator {
