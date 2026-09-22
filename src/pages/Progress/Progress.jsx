@@ -32,21 +32,91 @@ function buildTrendPaths(values) {
     return { linePath, areaPath, coords };
 }
 
-function TrendChart({ values, color = "var(--accent)", fillColor = "var(--accent-bg)" }) {
-    if (!values.length) return null;
-    if (values.length === 1) {
+function formatTipDate(date) {
+    return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+}
+
+function formatSignedDelta(diff, unitLabel) {
+    const rounded = Math.round(diff * 10) / 10;
+    const sign = rounded > 0 ? "+" : "";
+    return `${sign}${rounded} ${unitLabel}`;
+}
+
+function TrendChart({ points, color = "var(--accent)", fillColor = "var(--accent-bg)", unitLabel = "" }) {
+    const [hoverIndex, setHoverIndex] = useState(null);
+    if (!points.length) return null;
+
+    const toggleHover = (i) => setHoverIndex((cur) => (cur === i ? null : i));
+
+    if (points.length === 1) {
+        const [point] = points;
         return (
-            <svg viewBox={`0 0 ${CHART_W} ${CHART_H}`} className={styles.trendSvg} preserveAspectRatio="none">
-                <circle cx={CHART_W / 2} cy={CHART_H / 2} r="4" fill={color} />
-            </svg>
+            <div className={styles.trendWrap}>
+                <svg viewBox={`0 0 ${CHART_W} ${CHART_H}`} className={styles.trendSvg} preserveAspectRatio="none">
+                    <circle
+                        cx={CHART_W / 2} cy={CHART_H / 2} r="4" fill={color}
+                        className={styles.trendPointHit}
+                        onMouseEnter={() => setHoverIndex(0)}
+                        onMouseLeave={() => setHoverIndex(null)}
+                        onClick={() => toggleHover(0)}
+                    />
+                </svg>
+                {hoverIndex === 0 && (
+                    <div className={styles.trendTooltip} style={{ left: "50%", top: "50%" }}>
+                        <span className={styles.trendTooltipDate}>{formatTipDate(point.date)}</span>
+                        <span className={styles.trendTooltipValue}>{point.value} {unitLabel}</span>
+                        <span className={styles.trendTooltipDelta}>First log</span>
+                    </div>
+                )}
+            </div>
         );
     }
-    const { linePath, areaPath } = buildTrendPaths(values);
+
+    const { linePath, areaPath, coords } = buildTrendPaths(points.map((p) => p.value));
+
     return (
-        <svg viewBox={`0 0 ${CHART_W} ${CHART_H}`} className={styles.trendSvg} preserveAspectRatio="none">
-            <path d={areaPath} fill={fillColor} stroke="none" />
-            <path d={linePath} fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+        <div className={styles.trendWrap}>
+            <svg viewBox={`0 0 ${CHART_W} ${CHART_H}`} className={styles.trendSvg} preserveAspectRatio="none">
+                <path d={areaPath} fill={fillColor} stroke="none" />
+                <path d={linePath} fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                {coords.map(([x, y], i) => (
+                    <g key={i}>
+                        <circle
+                            cx={x} cy={y}
+                            r={hoverIndex === i ? 5 : 3}
+                            fill={hoverIndex === i ? color : "var(--bg-surface)"}
+                            stroke={color}
+                            strokeWidth="2"
+                            className={styles.trendPoint}
+                        />
+                        <circle
+                            cx={x} cy={y} r="10" fill="transparent"
+                            className={styles.trendPointHit}
+                            onMouseEnter={() => setHoverIndex(i)}
+                            onMouseLeave={() => setHoverIndex(null)}
+                            onClick={() => toggleHover(i)}
+                        />
+                    </g>
+                ))}
+            </svg>
+            {hoverIndex != null && (
+                <div
+                    className={styles.trendTooltip}
+                    style={{
+                        left: `${(coords[hoverIndex][0] / CHART_W) * 100}%`,
+                        top: `${(coords[hoverIndex][1] / CHART_H) * 100}%`,
+                    }}
+                >
+                    <span className={styles.trendTooltipDate}>{formatTipDate(points[hoverIndex].date)}</span>
+                    <span className={styles.trendTooltipValue}>{points[hoverIndex].value} {unitLabel}</span>
+                    <span className={styles.trendTooltipDelta}>
+                        {hoverIndex > 0
+                            ? `${formatSignedDelta(points[hoverIndex].value - points[hoverIndex - 1].value, unitLabel)} vs previous`
+                            : "First log"}
+                    </span>
+                </div>
+            )}
+        </div>
     );
 }
 
@@ -161,8 +231,8 @@ function Progress() {
         return 1 - remainingGap / totalGap;
     }, [profile.targetWeight, latestWeightLbs, startingWeightLbs]);
 
-    const weightChartValues = useMemo(
-        () => weightLogs.map((l) => lbsToDisplayWeight(l.weightLbs, unitSystem)),
+    const weightChartPoints = useMemo(
+        () => weightLogs.map((l) => ({ value: lbsToDisplayWeight(l.weightLbs, unitSystem), date: l.loggedAt })),
         [weightLogs, unitSystem]
     );
 
@@ -172,12 +242,12 @@ function Progress() {
             .filter((w) => (w.exercises || []).some((ex) => ex.name === activeExercise))
             .map((w) => {
                 const ex = w.exercises.find((e) => e.name === activeExercise);
-                return { date: w.date, weight: topSetWeight(ex) };
+                return { date: w.date, value: topSetWeight(ex) };
             })
-            .filter((p) => p.weight > 0);
+            .filter((p) => p.value > 0);
     }, [workouts, activeExercise]);
 
-    const currentTopSetWeight = strengthPoints.length ? strengthPoints[strengthPoints.length - 1].weight : 0;
+    const currentTopSetWeight = strengthPoints.length ? strengthPoints[strengthPoints.length - 1].value : 0;
 
     const selectedGoal = useMemo(
         () => activeExercise
@@ -333,7 +403,7 @@ function Progress() {
                                             </button>
                                         )}
                                     </div>
-                                    <TrendChart values={weightChartValues} />
+                                    <TrendChart points={weightChartPoints} unitLabel={unitLabel} />
                                 </>
                             )}
                         </div>
@@ -369,7 +439,7 @@ function Progress() {
                                         <p className={styles.mutedNote}>No numeric set data logged for this exercise yet.</p>
                                     ) : (
                                         <>
-                                            <TrendChart values={strengthPoints.map((p) => p.weight)} color="var(--accent-2)" fillColor="var(--accent-2-bg)" />
+                                            <TrendChart points={strengthPoints} color="var(--accent-2)" fillColor="var(--accent-2-bg)" unitLabel="lbs" />
                                             <p className={styles.mutedNote}>Latest top set: {currentTopSetWeight} lbs</p>
                                         </>
                                     )}
