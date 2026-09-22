@@ -8,6 +8,7 @@ import { collection, doc, deleteDoc, getDoc, query, where, orderBy, getDocs, Tim
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDumbbell, faFire, faLightbulb, faChevronRight, faChevronLeft, faListCheck, faTrash, faPen, faPlus, faUser, faClipboardList } from '@fortawesome/free-solid-svg-icons';
 import { useModal } from "../../hooks/useModal";
+import { getTipOfTheDay } from "../../utils/tips";
 
 const DAY_LABELS = ["M", "T", "W", "T", "F", "S", "S"];
 
@@ -377,7 +378,7 @@ function Dashboard() {
                     </div>
                     <div className={styles.tipContent}>
                         <span className={styles.tipEyebrow}>Tip of the Day</span>
-                        <span className={styles.tipText}>Carbs are your best fuel source — try a light meal 1&ndash;2 hrs before training.</span>
+                        <span className={styles.tipText}>{getTipOfTheDay()}</span>
                     </div>
                 </div>
                 </div>
